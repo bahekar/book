@@ -1,0 +1,207 @@
+<%@include file="header.jsp" %>   
+    
+    <div class="content">
+        <div class="header">
+            <h1 class="page-title">Add Book</h1>
+        </div>
+        <ul class="breadcrumb">
+            <li><a href="home">Home</a> <span class="divider">/</span></li>
+            <li>Add Book</li>
+        </ul>
+        <div class="container-fluid">
+            <div class="row-fluid">
+				<br><br><br>
+				<div class="well">
+					
+					<div class="row-fluid">
+						<div class="span6">
+							<div class="span4">Category*</div>
+                                                        <select id="category_id" name="category_id" onchange="get_sub_category(this.value)">
+                                                            <option value="">Select Category</option>
+							</select>
+						</div>
+						<div class="span6">
+							<div class="span4">Sub Category*</div>
+                                                        <select id="sub_category_id" name="sub_category_id">
+                                                            
+							</select>
+						</div>
+					</div>
+					<div class="row-fluid">
+						<div class="span6">
+							<div class="span4">Book Name English*</div>
+                                                        <input type="text" id="book_name_english" name="book_name_english" placeholder="Book Name English Code" class="input-xlarge">
+						</div>
+						<div class="span6">
+							<div class="span4">Book Name Hindi*</div>
+							<input type="text" id="book_name_hindi" name="book_name_hindi" placeholder="Book Name Hindi" class="input-xlarge">
+						</div>
+					</div>
+					
+					<div class="row-fluid">
+						<div class="span6">
+							<div class="span4">Book Name Urdu*</div>
+                                                        <input type="text" id="book_name_urdu" name="book_name_urdu" placeholder="Book Name Urdu" class="input-xlarge">
+						</div>
+						<div class="span6">
+							<div class="span4">Published Date*</div>
+                                                        <input type="text" id="published_date" autocomplete="off" name="published_date" placeholder="Published Date" class="input-xlarge">
+						</div>
+					</div>
+					
+					<div class="row-fluid">
+                                                <div class="span6">
+							<div class="span4">Author Name*</div>
+                                                        <input type="text" id="author_name" name="author_name" placeholder="Author Name" class="input-xlarge">
+						</div>
+						<div class="span6">
+						</div>
+					</div>
+                                        <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
+					
+				</div>
+                
+<%@include file="footer.jsp" %> 
+<script type="text/javascript">
+    category_id();
+    function category_id() 
+    {
+        $.ajax({
+            url: "getcategory",
+            type: "GET",
+            dataType: "json",
+            async: false,
+            contentType: "application/json",
+            success: function (response)
+            {
+                response = response.response.propertyTypes;
+                $.each(response, function (idx, rec) {
+//                  alert(rec.propertyTypes.toString());
+                    $('<option/>', {
+                        'value': rec.id,
+                        'text': rec.name
+                    }).appendTo('#category_id');
+                });
+            }
+        });
+    }
+    function get_sub_category(category_id)
+    {
+        $.ajax({
+            url: "get_sub_category?id="+category_id,
+            type: "GET",
+            dataType: "json",
+            async: false,
+            contentType: "application/json",
+            success: function (response)
+            {
+                response = response.response.propertyTypes;
+                $('#sub_category_id').html('<option value="">Select Sub Category</option>');
+                $.each(response, function (idx, rec) {
+                    $('<option/>', {
+                        'value': rec.id,
+                        'text': rec.name
+                    }).appendTo('#sub_category_id');
+                });
+            }
+        });
+    }
+            $("#addcontent").click(function () {
+                var contentnamejson = {};
+                iserror = false;
+                book_name_english = $("#book_name_english").val();
+                book_name_hindi = $("#book_name_hindi").val();
+                book_name_urdu = $("#book_name_urdu").val();
+                category_id = $("#category_id").val();
+                sub_category_id = $("#sub_category_id").val();
+                published_date = $("#published_date").val();
+                author_name = $("#author_name").val();
+                
+                if (book_name_english == '') {
+                    addclass('book_name_english');
+                    iserror = true;
+                } else {
+                    removeclass('book_name_english');
+                }
+                if (book_name_hindi == '') {
+                    addclass('book_name_hindi');
+                    iserror = true;
+                } else {
+                    removeclass('book_name_hindi');
+                }
+                if (book_name_urdu == '') {
+                    addclass('book_name_urdu');
+                    iserror = true;
+                } else {
+                    removeclass('book_name_urdu');
+                }
+                if (category_id == '') {
+                    addclass('category_id');
+                    iserror = true;
+                } else {
+                    removeclass('category_id');
+                }
+                if (sub_category_id == '') {
+                    addclass('sub_category_id');
+                    iserror = true;
+                } else {
+                    removeclass('sub_category_id');
+                }
+                if (published_date == '') {
+                    addclass('published_date');
+                    iserror = true;
+                } else {
+                    removeclass('published_date');
+                }
+                if (author_name == '') {
+                    addclass('author_name');
+                    iserror = true;
+                } else {
+                    removeclass('author_name');
+                }
+                if (iserror) {
+                    return false;
+                }
+                
+                contentnamejson['book_name_english'] = book_name_english;
+                contentnamejson['book_name_hindi'] = book_name_hindi;
+                contentnamejson['book_name_urdu'] = book_name_urdu;
+                contentnamejson['category_id'] = category_id;
+                contentnamejson['sub_category_id'] = sub_category_id;
+                contentnamejson['published_date'] = published_date;
+                contentnamejson['author_name'] = author_name;
+                
+                       var content_value = JSON.stringify(contentnamejson);
+                        $.ajax({
+                            url: "addcontent",
+                            type: "POST",
+                            dataType: "json",
+                            data:content_value,
+                            async: false,
+                            contentType: "application/json",
+                            success: function (data)
+                            {
+                                code = data.response.code;
+                                //alert(code);
+                                if (code == 0) {
+                                    swal({title: "Success", text: "Book added Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
+                                        if (isConfirm) {
+                                            //alert(isConfirm);
+                                            window.location = 'list_book';
+                                        }
+                                    });
+                                } else if (code == 108) {
+                                    sweetAlert('Oops...', 'Invalid UserId!', 'error');
+
+                                } else if (code == 109) {
+                                    sweetAlert('Oops...', 'Invalid Password!', 'error');
+
+                                } else {
+                                    sweetAlert('Oops...', 'Something went wrong!', 'error');
+                                }
+                            }
+                        });
+
+                    });
+                    
+</script>
