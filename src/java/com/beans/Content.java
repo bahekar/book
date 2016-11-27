@@ -26,6 +26,7 @@ public class Content {
     private String book_name_urdu;
     private String published_date;
     private String author_name;
+    private String filePath;
     /**
      * @return the contentname
      */
@@ -248,5 +249,19 @@ public class Content {
      */
     public void setAuthor_name(String author_name) {
         this.author_name = author_name;
+    }
+
+    /**
+     * @return the filePath
+     */
+    public String getFilePath() {
+        return filePath;
+    }
+
+    /**
+     * @param filePath the filePath to set
+     */
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

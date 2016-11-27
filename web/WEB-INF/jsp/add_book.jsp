@@ -1,4 +1,5 @@
 <%@include file="header.jsp" %>   
+      <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
     
     <div class="content">
         <div class="header">
@@ -11,6 +12,8 @@
         <div class="container-fluid">
             <div class="row-fluid">
 				<br><br><br>
+                                        <form:form method="post" onsubmit="return Categorysave();" action="addcontent"  enctype="multipart/form-data">
+
 				<div class="well">
 					
 					<div class="row-fluid">
@@ -57,10 +60,19 @@
 						<div class="span6">
 						</div>
 					</div>
+                                    					
+					<div class="row-fluid">
+                                                <div class="span6">
+							<div class="span4">Upload File*</div>
+                                         <input type="file" id="excel" name="file[]" class="input-xlarge" style="border: 1px solid #ccc;">
+                     			</div>
+						<div class="span6">
+						</div>
+					</div>
                                         <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
 					
 				</div>
-                
+                              </form:form>
 <%@include file="footer.jsp" %> 
 <script type="text/javascript">
     category_id();
@@ -106,7 +118,7 @@
             }
         });
     }
-            $("#addcontent").click(function () {
+          function Categorysave()  {
                 var contentnamejson = {};
                 iserror = false;
                 book_name_english = $("#book_name_english").val();
@@ -161,6 +173,8 @@
                 }
                 if (iserror) {
                     return false;
+                }else{
+                     return true;
                 }
                 
                 contentnamejson['book_name_english'] = book_name_english;
@@ -201,7 +215,6 @@
                                 }
                             }
                         });
-
-                    });
+                        }
                     
 </script>

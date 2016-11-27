@@ -12,7 +12,7 @@
     <mvc:annotation-driven />
         <mvc:resources mapping="/resources/**" location="/resources/" />  
         <!--<mvc:resources mapping="/images/**" location="file:D:/TEST-APPLICATIONS/API/images/"/>-->  
-        <mvc:resources mapping="/images/**" location="file:/api/images/"/> 
+        <mvc:resources mapping="/filepath/**" location="file:/api/filepath/"/> 
     <bean name="viewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
     <bean name="jsonTemplate" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>
     <bean id="jspViewResolver"

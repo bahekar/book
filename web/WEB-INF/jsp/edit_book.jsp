@@ -1,5 +1,5 @@
 <%@include file="header.jsp" %>   
-    
+      <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
     <div class="content">
         <div class="header">
             <h1 class="page-title">Edit Book</h1>
@@ -12,7 +12,8 @@
             <div class="row-fluid">
 				<br><br><br>
 				<div class="well">
-					
+					     <form:form method="post" onsubmit="return Categorysave();" action="edit_content"  enctype="multipart/form-data">
+
 					<div class="row-fluid">
 						<div class="span6">
 							<div class="span4">Category*</div>
@@ -57,10 +58,21 @@
 						<div class="span6">
 						</div>
 					</div>
+                                    					<div class="row-fluid">
+                                                <div class="span6">
+							<div class="span4">Upload File*</div>
+                                         <input type="file" id="excel" name="file[]" class="input-xlarge" style="border: 1px solid #ccc;">
+                     			</div>
+						<div class="span6">
+                                                    <a id="link" target="_blank">File Link</a>
+						</div>
+					</div>
+                                                 <input type="hidden" id="book_id" name="book_id">
+			    
                                         <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
 					
 				</div>
-                
+                  </form:form>
 <%@include file="footer.jsp" %> 
 <script type="text/javascript">
 category_id();
@@ -119,8 +131,11 @@ category_id();
         $("#sub_category_id").val(obj.sub_category_id);
         $("#published_date").val(obj.published_date);
         $("#author_name").val(obj.author_name);
+     
+        $("#link").attr("href", obj.file_path);
+        //$("#link").html(obj.file_path);
     }
-            $("#addcontent").click(function () {
+           function Categorysave(){
 
                 var contentnamejson = {};
                 iserror = false;
@@ -176,6 +191,10 @@ category_id();
                 }
                 if (iserror) {
                     return false;
+                }else{book_id
+                    id = getParameterByName("id");
+                       $("#book_id").val(id);
+                     return true;
                 }
                 contentnamejson['book_name_english'] = book_name_english;
                 contentnamejson['book_name_hindi'] = book_name_hindi;
@@ -217,5 +236,5 @@ category_id();
                                 }
                             }
                         });
-                    });
+                    }
 </script>

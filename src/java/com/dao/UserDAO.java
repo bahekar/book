@@ -60,14 +60,14 @@ public class UserDAO {
 
     public UserDAO() {
         dbconnection = DBConnection.getInstance();
-        url = ConfigUtil.getProperty("url", "http://54.169.135.247:8080/menubook");
+        url = ConfigUtil.getProperty("url", "http://35.154.44.42:8080/bookmanagement");
 //        url = "http://localhost:8080/menubook";
         HttpDispatchClient.getInstance();
     }
     static Log logger = LogFactory.getLog(UserDAO.class);
 
     public int addcontent(Content objContent) {
-        String insertQuery = ConfigUtil.getProperty("store.book.query", "INSERT INTO `adminbook`.`book`(`book_name_english`,`book_name_hindi`,`book_name_urdu`,`category_id`,`sub_category_id`,`published_date`,`author_name`) VALUES (?,?,?,?,?,?,?)");
+        String insertQuery = ConfigUtil.getProperty("store.book.query", "INSERT INTO `adminbook`.`book`(`book_name_english`,`book_name_hindi`,`book_name_urdu`,`category_id`,`sub_category_id`,`published_date`,`author_name`,`file_path`) VALUES (?,?,?,?,?,?,?,?)");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -84,13 +84,13 @@ public class UserDAO {
                 pstmt.setString(5, objContent.getSub_category_id());
                 pstmt.setString(6, objContent.getPublished_date());
                 pstmt.setString(7, objContent.getAuthor_name());
-
+                pstmt.setString(8, objContent.getFilePath());
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
                     nRes = rs.getInt(1);
                 }
-                
+
                 return nRes;
             }
         } catch (SQLException sqle) {
@@ -116,7 +116,12 @@ public class UserDAO {
             objConn = DBConnection.getInstance().getConnection();
             if (objConn != null) {
 
-                pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+                if (StringUtils.isBlank(objContent.getFilePath())) {
+                    pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+                } else {
+                    updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `book_name_english`=?,`book_name_hindi`=?,`book_name_urdu`=?,`category_id`=?,`sub_category_id`=?,`published_date`=?,`author_name`=?,`file_path`=? where id=? ");
+                    pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+                }
 
                 pstmt.setString(1, objContent.getBook_name_english());
                 pstmt.setString(2, objContent.getBook_name_hindi());
@@ -125,8 +130,12 @@ public class UserDAO {
                 pstmt.setString(5, objContent.getSub_category_id());
                 pstmt.setString(6, objContent.getPublished_date());
                 pstmt.setString(7, objContent.getAuthor_name());
-                pstmt.setString(8, objContent.getId());
-
+                if (StringUtils.isBlank(objContent.getFilePath())) {
+                    pstmt.setString(8, objContent.getId());
+                } else {
+                    pstmt.setString(8, objContent.getFilePath());
+                    pstmt.setString(9, objContent.getId());
+                }
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
@@ -151,10 +160,10 @@ public class UserDAO {
     public JSONObject edit_rss_content(String id) {
         JSONObject neighborhoodObj = new JSONObject();
         String single_details = ConfigUtil.getProperty("single_details", "SELECT * FROM rss_feed where id=" + id);
-            ResultSet rs = null;
-     
+        ResultSet rs = null;
+
         PreparedStatement pstmt = null;
-       
+
         Connection objConn = null;
         try {
 
@@ -164,7 +173,7 @@ public class UserDAO {
 
                 rs = pstmt.executeQuery();
                 if (rs.next()) {
-                     neighborhoodObj.put("category_id", Utilities.nullToEmpty(rs.getString("category_id")));
+                    neighborhoodObj.put("category_id", Utilities.nullToEmpty(rs.getString("category_id")));
                     neighborhoodObj.put("description", Utilities.nullToEmpty(rs.getString("description")));
                 }
 
@@ -791,7 +800,8 @@ public class UserDAO {
         }
         return status;
     }
-  public User adminLoginDetails(User loginRequestBean, String strTransId) throws SQLException, Exception {
+
+    public User adminLoginDetails(User loginRequestBean, String strTransId) throws SQLException, Exception {
         String selectQuery = ConfigUtil.getProperty("user.login.query", "select * from users where user_id=?");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -858,6 +868,7 @@ public class UserDAO {
                     neighborhoodObj.put("sub_category_id", Utilities.nullToEmpty(rs.getString("sub_category_id")));
                     neighborhoodObj.put("published_date", Utilities.nullToEmpty(rs.getString("published_date")));
                     neighborhoodObj.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                    neighborhoodObj.put("file_path", url + Utilities.nullToEmpty(rs.getString("file_path")));
                 }
             }
         } catch (Exception e) {
