@@ -41,7 +41,7 @@ public class CategoryDAO {
     static Log logger = LogFactory.getLog(UserDAO.class);
 
     public int addCategory(String category) throws SQLException, Exception {
-        String insertQuery = ConfigUtil.getProperty("store.category.data.query", "INSERT INTO `cms`.`category`(`category`) VALUES (?)");
+        String insertQuery = ConfigUtil.getProperty("store.category.data.query", "INSERT INTO `adminbook`.`category`(`category`) VALUES (?)");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
 
@@ -290,7 +290,7 @@ public class CategoryDAO {
     }
 
     public int sub_category_insert(String sub_category, String category_id) throws SQLException, Exception {
-        String insertQuery = ConfigUtil.getProperty("sub_category.query", "INSERT INTO `cms`.`sub_category`(`sub_category`,`category_id`) VALUES (?,?)");
+        String insertQuery = ConfigUtil.getProperty("sub_category.query", "INSERT INTO `adminbook`.`sub_category`(`sub_category`,`category_id`) VALUES (?,?)");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
 
