@@ -215,5 +215,73 @@ public class CategoryService {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), "");
         }
     }
+    
+    public JSONArray faqlist(String transId, int fromIndex, int endIndex) throws SQLException, Exception {
+        return objUserDAO.faqlist(transId, fromIndex, endIndex);
+    }
+
+    public int faqlistCount(String transId) throws SQLException, Exception {
+        return objUserDAO.faqlistCount(transId);
+    }
+    
+    public String faqsave(String question, String answer, String strTid) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        try {
+            isUpdated = objUserDAO.faqsave(question, answer);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponsetoken(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            }
+        } catch (Exception e) {
+            logger.error("Exception in faqsave(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    public String delete_faq(String id, String strTid) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        try {
+
+            isUpdated = objUserDAO.delete_faq(id);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponsetoken(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in delete_faq(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    public JSONObject getFAQ_details(String strTid, String id) {
+        return objUserDAO.getFAQ_details(id);
+    }
+    
+    public String faqupdate(String question, String answer, String id) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.faqupdate(question, answer, id);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in addPropertyToAgent(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
 
 }

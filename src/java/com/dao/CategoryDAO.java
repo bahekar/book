@@ -587,5 +587,196 @@ public class CategoryDAO {
         }
         return status;
     }
+    
+    public JSONArray faqlist(String strTid, int fromIndex, int endIndex) throws SQLException, Exception {
+        String userdetailsquery = ConfigUtil.getProperty("faq.query", "SELECT * FROM faq ");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(userdetailsquery);
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("question", Utilities.nullToEmpty(rs.getString("question")));
+                    property.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
+                    propertyArray.put(property);
+                }
+
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while faq list" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while faq list" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+
+    public int faqlistCount(String strTid) throws SQLException, Exception {
+        String userdetailsquery = ConfigUtil.getProperty("cat.count.query", "SELECT count(*) as count FROM faq");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        int count = 0;
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(userdetailsquery);
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    count = rs.getInt("count");
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while faq list" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while faq list" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return count;
+    }
+    
+    public int faqsave(String question, String answer) throws SQLException, Exception {
+        String insertQuery = ConfigUtil.getProperty("store.faq.query", "INSERT INTO `adminbook`.`faq`(`question`,`answer`) VALUES (?,?)");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+
+        Connection objConn = null;
+        int status = 0;
+        try {
+            objConn = dbconnection.getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, question);
+                pstmt.setString(2, answer);
+                status = pstmt.executeUpdate();
+            } else {
+                logger.error("add faq(): connection object is null");
+            }
+        } catch (SQLException sqle) {
+            logger.error("add faq() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("add faq() Got Exception : " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return status;
+    }
+    
+    public int delete_faq(String id) throws SQLException, Exception {
+        String delete_faq = ConfigUtil.getProperty("delete_category", "DELETE FROM `faq` WHERE id=?");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+
+        Connection objConn = null;
+        int status = 0;
+        try {
+            objConn = dbconnection.getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(delete_faq);
+                pstmt.setString(1, id);
+                status = pstmt.executeUpdate();
+
+                logger.debug("no of res deletetd is :" + status);
+
+            } else {
+                logger.error("delete_faq(): connection object is null");
+            }
+        } catch (SQLException sqle) {
+            logger.error("delete_faq() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("delete_faq() Got Exception : " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return status;
+    }
+    
+    public JSONObject getFAQ_details(String id) {
+        JSONObject neighborhoodObj = new JSONObject();
+        String neighborhood_details = ConfigUtil.getProperty("faq_details", "SELECT * FROM faq where id=" + id);
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(neighborhood_details);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    neighborhoodObj.put("question", Utilities.nullToEmpty(rs.getString("question")));
+                    neighborhoodObj.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error(" Got getFAQ_details" + Utilities.getStackTrace(e));
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return neighborhoodObj;
+    }
+    
+    public int faqupdate(String question, String answer, String id) {
+        String insertQuery = ConfigUtil.getProperty("update.faq", "UPDATE `faq` SET `question`=?, `answer`=? WHERE `id`=?;");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(insertQuery);
+                pstmt.setString(1, question);
+                pstmt.setString(2, answer);
+                pstmt.setString(3, id);
+                int nRes = pstmt.executeUpdate();
+                return nRes;
+            }
+
+        } catch (SQLException sqle) {
+            logger.error("faqupdate() : Got SQLException " + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+            logger.error("faqupdate() : Got SQLException " + Utilities.getStackTrace(e));
+
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
 
 }

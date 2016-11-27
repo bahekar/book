@@ -59,27 +59,22 @@ public class CategoryController {
 
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     public Object category(HttpServletRequest request) {
-
         ModelAndView model = new ModelAndView();
         model.setViewName("category");
         return model;
-
     }
 
     @RequestMapping(value = "/add-category", method = RequestMethod.GET)
     public Object add_category(HttpServletRequest request) {
-
         ModelAndView model = new ModelAndView();
         model.setViewName("add-category");
         return model;
-
     }
 
     @RequestMapping(value = "/categorysave", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
     public String categorysave(@RequestParam(value = "category", required = false) String category, HttpSession httpSession) {
         String transId = UUID.randomUUID().toString();
         String strResponse = objUserService.addCategory(category, transId);
-
         return strResponse;
     }
 
@@ -270,8 +265,93 @@ public class CategoryController {
             logger.error("Exception in signup(),ex:" + e.getMessage(), e);
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId);
         }
+        return strResponse;
+    }
+    
+    @RequestMapping(value = "/list_faq", method = RequestMethod.GET)
+    public Object list_faq(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("list_faq");
+        return model;
+    }
+
+    @RequestMapping(value = "/add_faq", method = RequestMethod.GET)
+    public Object add_faq(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("add_faq");
+        return model;
+    }
+    
+    @RequestMapping(value = "/faqlist", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
+    public String faqlist(@RequestParam("page") int page,
+            @RequestParam("rows") int endIndex) {
+        String strTid = UUID.randomUUID().toString();
+        String strResult = null;
+        try {
+            int fromIndex = 0;
+            if (page > 0) {
+                fromIndex = (page - 1) * endIndex;
+            }
+            JSONObject json = new JSONObject();
+            JSONArray obj = objUserService.faqlist(strTid, fromIndex, endIndex);
+            json.put("total", objUserService.faqlistCount(strTid));
+            json.put("page", page);
+            json.put("records", obj.length());
+            json.put("rows", obj);
+            return json.toString();
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid);
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    @RequestMapping(value = "/faqsave", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+    public String faqsave(@RequestParam(value = "question", required = false) String question, @RequestParam(value = "answer", required = false) String answer, HttpSession httpSession) {
+        String transId = UUID.randomUUID().toString();
+            String strResponse = objUserService.faqsave(question, answer, transId);
+        return strResponse;
+    }
+    
+    @RequestMapping(value = "/delete_faq", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+    public String delete_faq(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) {
+        String transId = UUID.randomUUID().toString();
+        String strResponse = objUserService.delete_faq(id, transId);
 
         return strResponse;
+    }
+    
+    @RequestMapping(value = "/edit_faq", method = RequestMethod.GET)
+    public Object edit_faq(HttpServletRequest request, @RequestParam(value = "id", required = false) String id) {
+
+        ModelAndView model = new ModelAndView();
+        String transId = UUID.randomUUID().toString();
+        model.setViewName("edit_faq");
+        HttpSession session = request.getSession();
+        JSONObject strResponse = objUserService.getFAQ_details(transId, id);
+        try {
+            session.setAttribute("question", strResponse.get("question"));
+            session.setAttribute("answer", strResponse.get("answer"));
+            // session.setAttribute("id", strResponse.get("id"));
+            //  session.setAttribute("description", strResponse.get("description"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return model;
+    }
+    
+    @RequestMapping(value = "/faqupdate", method = RequestMethod.GET, produces = {"application/json"})
+    public String faqupdate(@RequestParam("question") String question, @RequestParam("answer") String answer, @RequestParam("id") String id, HttpSession httpSession) {
+        String response = "";
+        try {
+            response = objUserService.faqupdate(question, answer, id);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 
 }

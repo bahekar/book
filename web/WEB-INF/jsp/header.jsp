@@ -77,6 +77,7 @@
             <li><a href="category">Category Listing</a></li>
             <li><a href="sub_category">Sub-Category Listing</a></li>
             <li><a href="list_book">Book Listing</a></li>
+            <li><a href="list_faq">FAQ Listing</a></li>
         </ul>
     </div>
   <script type="text/javascript">
