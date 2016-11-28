@@ -41,6 +41,7 @@
         htmocontent = htmocontent + '<th>Book Name Urdu</th>';
         htmocontent = htmocontent + '<th>Author Name</th>';
         htmocontent = htmocontent + '<th>Published Date</th>';
+        htmocontent = htmocontent + '<th>Uploaded File</th>';
         htmocontent = htmocontent + '<th>Edit</th>';
         htmocontent = htmocontent + '<th>Delete</th>';
         htmocontent = htmocontent + '</tr></thead><tbody>';
@@ -53,6 +54,7 @@
             htmocontent = htmocontent + '<td>' + selectedRow.book_name_urdu + '</td>';
             htmocontent = htmocontent + '<td>' + selectedRow.author_name + '</td>';
             htmocontent = htmocontent + '<td>' + selectedRow.published_date + '</td>';
+            htmocontent = htmocontent + '<td><a href="' + selectedRow.file_path + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
             htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ')" >Edit</a></td>';
             htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +')">Delete</a></td>';
             htmocontent = htmocontent + '</tr>';
