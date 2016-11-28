@@ -212,6 +212,7 @@ public class UserDAO {
                     property.put("book_name_urdu", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
                     property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                     property.put("published_date", Utilities.nullToEmpty(rs.getString("published_date")));
+                    property.put("file_path", url + Utilities.nullToEmpty(rs.getString("file_path")));
                     property.put(Constants.createdOn, rs.getString("created_datetime"));
                     propertyArray.put(property);
                 }
