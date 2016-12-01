@@ -175,8 +175,20 @@ public class CategoryService {
         }
     }
 
-    public String getFeed(String strTid, String id) {
-        return objUserDAO.getFeed(id);
+    public JSONArray getcategory(String strTid) {
+        return objUserDAO.getcategory();
+    }
+
+    public JSONArray getAuthors() {
+        return objUserDAO.getAuthors();
+    }
+
+    public JSONArray getsubcategory(String id) {
+        return objUserDAO.getsubcategory(id);
+    }
+
+    public JSONArray getThoughts(String language) {
+        return objUserDAO.getThoughts(language);
     }
 
     public String delete_rss_feed(String strTid, String id) {
@@ -215,7 +227,7 @@ public class CategoryService {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), "");
         }
     }
-    
+
     public JSONArray faqlist(String transId, int fromIndex, int endIndex) throws SQLException, Exception {
         return objUserDAO.faqlist(transId, fromIndex, endIndex);
     }
@@ -223,7 +235,7 @@ public class CategoryService {
     public int faqlistCount(String transId) throws SQLException, Exception {
         return objUserDAO.faqlistCount(transId);
     }
-    
+
     public String faqsave(String question, String answer, String strTid) {
         int isUpdated = 0;
         int nUserID = -1;
@@ -240,7 +252,7 @@ public class CategoryService {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
-    
+
     public String delete_faq(String id, String strTid) {
         int isUpdated = 0;
         int nUserID = -1;
@@ -259,11 +271,11 @@ public class CategoryService {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
-    
+
     public JSONObject getFAQ_details(String strTid, String id) {
         return objUserDAO.getFAQ_details(id);
     }
-    
+
     public String faqupdate(String question, String answer, String id) {
         int isUpdated = 0;
         int nUserID = -1;

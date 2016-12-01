@@ -17,6 +17,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -31,6 +34,7 @@ public class CategoryDAO {
     DBConnection dbconnection = null;
     String url = "";
     public static final double oneSquareMeter = Double.valueOf(ConfigUtil.getProperty("one.square.meter", "0.092903"));
+    private final Lock lock1 = new ReentrantLock();
 
     public CategoryDAO() {
         dbconnection = DBConnection.getInstance();
@@ -424,85 +428,83 @@ public class CategoryDAO {
         return status;
     }
 
-    public String getFeed(String id) {
-        String selectfeed1 = ConfigUtil.getProperty("select.feed.query1", "SELECT * FROM category WHERE id=" + id + ";");
+    public JSONArray getcategory() {
+        String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM category");
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
         JSONArray propertyArray = new JSONArray();
         StringBuffer ob = new StringBuffer();
-
+        lock1.lock();
         try {
-            String date = Utilities.currentDate();
-            String day = Utilities.currentDay();
             objConn = DBConnection.getInstance().getConnection();
             if (objConn != null) {
-                pstmt = objConn.prepareStatement(selectfeed1);
+                pstmt = objConn.prepareStatement(selectcat);
                 rs = pstmt.executeQuery();
-                if (rs.next()) {
-                    ob.append("<rss version=\"2.0\"><channel><link/><description/><copyright/>");
-                    String title = rs.getString("Category");
-                    String selectfeed = ConfigUtil.getProperty("select.feed.query", "SELECT * FROM rss_feed WHERE category_id=" + id + " and created_datetime like '" + date + "%' ORDER BY id asc LIMIT 1;");
-
-                    pstmt = objConn.prepareStatement(selectfeed);
-                    rs = pstmt.executeQuery();
-                    if (rs.next()) {
-                        ob.append(getXml(ob, rs, title));
-                    } else {
-                        //check for today date also 
-                        selectfeed = ConfigUtil.getProperty("select.feed.query", "SELECT * FROM rss_feed WHERE STATUS=1 and pdate='" + day + "' and category_id=" + id + "  ORDER BY id asc LIMIT 1;");
-                        pstmt = objConn.prepareStatement(selectfeed);
-                        rs = pstmt.executeQuery();
-                        if (rs.next()) {
-                            ob.append(getXml(ob, rs, title));
-                        } else {
-
-                            selectfeed = ConfigUtil.getProperty("select.feed.query", "SELECT * FROM rss_feed WHERE STATUS='0' and  category_id=" + id + "  ORDER BY id asc LIMIT 1;");
-                            pstmt = objConn.prepareStatement(selectfeed);
-                            rs = pstmt.executeQuery();
-                            if (rs.next()) {
-                                String rowid = rs.getString("id");
-                                ob.append(getXml(ob, rs, title));
-                                //update remaning all to 0 
-                                pstmt = objConn.prepareStatement("update rss_feed set STATUS='0' where category_id=" + id);
-                                pstmt.executeUpdate();
-                                pstmt = objConn.prepareStatement("update rss_feed set STATUS='1',pdate='" + day + "' where id=" + rowid);
-                                pstmt.executeUpdate();
-                                //update to status =1 and today date
-
-                            } else {
-                                selectfeed = ConfigUtil.getProperty("select.feed.query", "SELECT * FROM rss_feed WHERE STATUS=1 and  category_id=" + id + "  ORDER BY id asc LIMIT 1;");
-                                pstmt = objConn.prepareStatement(selectfeed);
-                                if (rs.next()) {
-                                    String rowid = rs.getString("id");
-                                    ob.append(getXml(ob, rs, title));
-                                    pstmt = objConn.prepareStatement("update rss_feed set STATUS='1',pdate='" + day + "'  where id=" + rowid);
-                                    pstmt.executeUpdate();
-                                    //update to status =1 and today date
-                                }
-                            }
-                        }
-                    }
-                    ob.append("</channel></rss>");
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("category", Utilities.nullToEmpty(rs.getString("Category")));
+                    propertyArray.put(property);
                 }
-            } else {
-                ob.append("<response>no category found</response>");
             }
         } catch (SQLException sqle) {
-            ob.append("<response>no category found</response>");
+
             logger.error(" Got SQLException while sub_category_list" + Utilities.getStackTrace(sqle));
 
         } catch (Exception e) {
-            ob.append("<response>no category found</response>");
+
             logger.error(" Got Exception while sub_category_list" + Utilities.getStackTrace(e));
 
         } finally {
+            lock1.unlock();
             if (objConn != null) {
                 dbconnection.closeConnection(rs, pstmt, objConn);
             }
         }
-        return ob.toString();
+        return propertyArray;
+    }
+
+    public JSONArray getsubcategory(String id) {
+        String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM sub_category");
+
+        if (StringUtils.isNotBlank(id)) {
+            selectcat = selectcat + " where category_id=" + id;
+        }
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+        StringBuffer ob = new StringBuffer();
+        lock1.lock();
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(selectcat);
+                rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("sub_category", Utilities.nullToEmpty(rs.getString("sub_category")));
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+
+            logger.error(" Got SQLException while sub_category_list" + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+
+            logger.error(" Got Exception while sub_category_list" + Utilities.getStackTrace(e));
+
+        } finally {
+            lock1.unlock();
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
     }
 
     public static StringBuffer getXml(StringBuffer sb, ResultSet rs, String title) throws SQLException {
@@ -587,7 +589,7 @@ public class CategoryDAO {
         }
         return status;
     }
-    
+
     public JSONArray faqlist(String strTid, int fromIndex, int endIndex) throws SQLException, Exception {
         String userdetailsquery = ConfigUtil.getProperty("faq.query", "SELECT * FROM faq ");
         ResultSet rs = null;
@@ -654,7 +656,7 @@ public class CategoryDAO {
         }
         return count;
     }
-    
+
     public int faqsave(String question, String answer) throws SQLException, Exception {
         String insertQuery = ConfigUtil.getProperty("store.faq.query", "INSERT INTO `adminbook`.`faq`(`question`,`answer`) VALUES (?,?)");
         ResultSet rs = null;
@@ -685,7 +687,7 @@ public class CategoryDAO {
         }
         return status;
     }
-    
+
     public int delete_faq(String id) throws SQLException, Exception {
         String delete_faq = ConfigUtil.getProperty("delete_category", "DELETE FROM `faq` WHERE id=?");
         ResultSet rs = null;
@@ -718,7 +720,7 @@ public class CategoryDAO {
         }
         return status;
     }
-    
+
     public JSONObject getFAQ_details(String id) {
         JSONObject neighborhoodObj = new JSONObject();
         String neighborhood_details = ConfigUtil.getProperty("faq_details", "SELECT * FROM faq where id=" + id);
@@ -747,7 +749,7 @@ public class CategoryDAO {
         }
         return neighborhoodObj;
     }
-    
+
     public int faqupdate(String question, String answer, String id) {
         String insertQuery = ConfigUtil.getProperty("update.faq", "UPDATE `faq` SET `question`=?, `answer`=? WHERE `id`=?;");
 
@@ -777,6 +779,153 @@ public class CategoryDAO {
             }
         }
         return -1;
+    }
+
+    public JSONArray getThoughts(String language) {
+        String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM book");
+
+        if (StringUtils.isNotBlank(language)) {
+            // selectcat = selectcat + " where category_id=" + id;
+            if (language.equalsIgnoreCase("English")) {
+                selectcat = selectcat + " where book_name_english IS NOT NULL";
+            }
+            if (language.equalsIgnoreCase("Urdu")) {
+                selectcat = selectcat + " where book_name_urdu IS NOT NULL";
+            }
+            if (language.equalsIgnoreCase("Hindi")) {
+                selectcat = selectcat + " where book_name_hindi IS NOT NULL";
+            }
+        }
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+
+        JSONArray thoughts = new JSONArray();
+        JSONArray propertyArrayhindi = new JSONArray();
+        JSONArray propertyArrayenglish = new JSONArray();
+        JSONArray propertyArrayUrdu = new JSONArray();
+        StringBuffer ob = new StringBuffer();
+        lock1.lock();
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(selectcat);
+                rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    if (StringUtils.isBlank(language)) {
+                        property.put(Constants.id, rs.getString(Constants.id));
+                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_english")));
+                        propertyArrayenglish.put(property);
+                        property = new JSONObject();
+                        property.put(Constants.id, rs.getString(Constants.id));
+                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_hindi")));
+                        propertyArrayhindi.put(property);
+                        property = new JSONObject();
+                        property.put(Constants.id, rs.getString(Constants.id));
+                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
+                        propertyArrayUrdu.put(property);
+                    } else if (language.equalsIgnoreCase("English")) {
+                        property.put(Constants.id, rs.getString(Constants.id));
+                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_english")));
+                        propertyArrayenglish.put(property);
+                    } else if (language.equalsIgnoreCase("Urdu")) {
+                        property.put(Constants.id, rs.getString(Constants.id));
+                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
+                        propertyArrayUrdu.put(property);
+                    } else if (language.equalsIgnoreCase("Hindi")) {
+                        property.put(Constants.id, rs.getString(Constants.id));
+                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        propertyArrayhindi.put(property);
+                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
+                    }
+                }
+                if (propertyArrayenglish.length() > 0) {
+                    JSONObject english = new JSONObject();
+                    english.put("english", propertyArrayenglish);
+                    thoughts.put(english);
+                }
+                if (propertyArrayhindi.length() > 0) {
+                    JSONObject hindi = new JSONObject();
+                    hindi.put("hindi", propertyArrayhindi);
+                    thoughts.put(hindi);
+                }
+                if (propertyArrayUrdu.length() > 0) {
+                    JSONObject urdu = new JSONObject();
+                    urdu.put("urdu", propertyArrayUrdu);
+                    thoughts.put(urdu);
+                }
+            }
+        } catch (SQLException sqle) {
+
+            logger.error(" Got SQLException while sub_category_list" + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+
+            logger.error(" Got Exception while sub_category_list" + Utilities.getStackTrace(e));
+
+        } finally {
+            lock1.unlock();
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return thoughts;
+    }
+
+    public JSONArray getAuthors() {
+        String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT id,author_name FROM book");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+        StringBuffer ob = new StringBuffer();
+        lock1.lock();
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(selectcat);
+                rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+
+            logger.error(" Got SQLException while sub_category_list" + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+
+            logger.error(" Got Exception while sub_category_list" + Utilities.getStackTrace(e));
+
+        } finally {
+            lock1.unlock();
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
     }
 
 }

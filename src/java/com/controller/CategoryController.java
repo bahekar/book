@@ -232,25 +232,61 @@ public class CategoryController {
         return strResponse;
     }
 
-
-    @RequestMapping(value = "/rsswebservice/{category}", method = RequestMethod.GET)
-    public  @ResponseBody byte[] getFeed(@PathVariable("category") String category, HttpSession httpSession) throws UnsupportedEncodingException {
+    @RequestMapping(value = "/api/categorylist", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] categorylist(HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONArray strResult = null;
         String transId = UUID.randomUUID().toString();
-        category = category.replace(".Xml", "");
-        String strResponse = objUserService.getFeed(transId, category);
 
-          return strResponse.getBytes("UTF-8");
+        try {
+            JSONObject objRequest = new JSONObject();
+            objRequest.put("code", "0");
+            objRequest.put("description", "success");
+            strResult = objUserService.getcategory(transId);
+
+            objRequest.put("categorylist", strResult);
+            return objRequest.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
     }
-    
-        @RequestMapping(value = "/delete_rss_feed", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+
+    @RequestMapping(value = "/api/subcategorylist", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] subcategorylist(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONArray strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+            JSONObject objRequest = new JSONObject();
+            objRequest.put("code", "0");
+            objRequest.put("description", "success");
+            strResult = objUserService.getsubcategory(id);
+
+            objRequest.put("subcategorylist", strResult);
+            return objRequest.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
+
+    @RequestMapping(value = "/delete_rss_feed", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
     public String delete_rss_feed(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) {
         String transId = UUID.randomUUID().toString();
-        String strResponse = objUserService.delete_rss_feed(transId,id);
+        String strResponse = objUserService.delete_rss_feed(transId, id);
 
         return strResponse;
     }
-    
-     @RequestMapping(value = "/rss_feed_update", method = RequestMethod.POST, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+
+    @RequestMapping(value = "/rss_feed_update", method = RequestMethod.POST, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
     public String rss_feed_update(@RequestBody String strJSON, HttpSession httpSession) {
         RssBean rss = null;
         String strResponse = null;
@@ -267,7 +303,7 @@ public class CategoryController {
         }
         return strResponse;
     }
-    
+
     @RequestMapping(value = "/list_faq", method = RequestMethod.GET)
     public Object list_faq(HttpServletRequest request) {
         ModelAndView model = new ModelAndView();
@@ -281,7 +317,7 @@ public class CategoryController {
         model.setViewName("add_faq");
         return model;
     }
-    
+
     @RequestMapping(value = "/faqlist", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
     public String faqlist(@RequestParam("page") int page,
             @RequestParam("rows") int endIndex) {
@@ -307,14 +343,14 @@ public class CategoryController {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
-    
+
     @RequestMapping(value = "/faqsave", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
     public String faqsave(@RequestParam(value = "question", required = false) String question, @RequestParam(value = "answer", required = false) String answer, HttpSession httpSession) {
         String transId = UUID.randomUUID().toString();
-            String strResponse = objUserService.faqsave(question, answer, transId);
+        String strResponse = objUserService.faqsave(question, answer, transId);
         return strResponse;
     }
-    
+
     @RequestMapping(value = "/delete_faq", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
     public String delete_faq(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) {
         String transId = UUID.randomUUID().toString();
@@ -322,7 +358,7 @@ public class CategoryController {
 
         return strResponse;
     }
-    
+
     @RequestMapping(value = "/edit_faq", method = RequestMethod.GET)
     public Object edit_faq(HttpServletRequest request, @RequestParam(value = "id", required = false) String id) {
 
@@ -341,7 +377,7 @@ public class CategoryController {
         }
         return model;
     }
-    
+
     @RequestMapping(value = "/faqupdate", method = RequestMethod.GET, produces = {"application/json"})
     public String faqupdate(@RequestParam("question") String question, @RequestParam("answer") String answer, @RequestParam("id") String id, HttpSession httpSession) {
         String response = "";
@@ -352,6 +388,52 @@ public class CategoryController {
             e.printStackTrace();
         }
         return response;
+    }
+
+    @RequestMapping(value = "/api/getthoughts", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getThoughts(@RequestParam(value = "language", required = false) String language, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONArray strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+            JSONObject objRequest = new JSONObject();
+            objRequest.put("code", "0");
+            objRequest.put("description", "success");
+            strResult = objUserService.getThoughts(language);
+
+            objRequest.put("thoughtslist", strResult);
+            return objRequest.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
+
+    @RequestMapping(value = "/api/getauthors", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getAuthors(HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONArray strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+            JSONObject objRequest = new JSONObject();
+            objRequest.put("code", "0");
+            objRequest.put("description", "success");
+            strResult = objUserService.getAuthors();
+
+            objRequest.put("authorslist", strResult);
+            return objRequest.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
     }
 
 }
