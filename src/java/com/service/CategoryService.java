@@ -187,8 +187,8 @@ public class CategoryService {
         return objUserDAO.getsubcategory(id);
     }
 
-    public JSONArray getThoughts(String language) {
-        return objUserDAO.getThoughts(language);
+    public JSONArray getbooks(String language) {
+        return objUserDAO.getbooks(language);
     }
 
     public String delete_rss_feed(String strTid, String id) {
@@ -296,4 +296,11 @@ public class CategoryService {
         }
     }
 
+    public JSONArray getphotos() {
+        return objUserDAO.getphotos();
+    }
+
+    public JSONArray getContent(String type) {
+        return objUserDAO.getContent(type);
+    }
 }

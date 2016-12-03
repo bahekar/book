@@ -390,9 +390,9 @@ public class CategoryController {
         return response;
     }
 
-    @RequestMapping(value = "/api/getthoughts", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/getbooks", method = RequestMethod.GET)
     public @ResponseBody
-    byte[] getThoughts(@RequestParam(value = "language", required = false) String language, HttpSession httpSession) throws UnsupportedEncodingException {
+    byte[] getbooks(@RequestParam(value = "language", required = false) String language, HttpSession httpSession) throws UnsupportedEncodingException {
         JSONArray strResult = null;
         String transId = UUID.randomUUID().toString();
 
@@ -400,9 +400,9 @@ public class CategoryController {
             JSONObject objRequest = new JSONObject();
             objRequest.put("code", "0");
             objRequest.put("description", "success");
-            strResult = objUserService.getThoughts(language);
+            strResult = objUserService.getbooks(language);
 
-            objRequest.put("thoughtslist", strResult);
+            objRequest.put("bookslist", strResult);
             return objRequest.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);
@@ -426,6 +426,52 @@ public class CategoryController {
             strResult = objUserService.getAuthors();
 
             objRequest.put("authorslist", strResult);
+            return objRequest.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
+
+    @RequestMapping(value = "/api/getphotos", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getphotos(HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONArray strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+            JSONObject objRequest = new JSONObject();
+            objRequest.put("code", "0");
+            objRequest.put("description", "success");
+            strResult = objUserService.getphotos();
+
+            objRequest.put("photoslist", strResult);
+            return objRequest.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
+
+    @RequestMapping(value = "/api/getContent", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getContent(@RequestParam(value = "type", required = false) String type, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONArray strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+            JSONObject objRequest = new JSONObject();
+            objRequest.put("code", "0");
+            objRequest.put("description", "success");
+            strResult = objUserService.getContent(type);
+
+            objRequest.put("contentlist", strResult);
             return objRequest.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);

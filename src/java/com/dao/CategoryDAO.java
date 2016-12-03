@@ -35,6 +35,9 @@ public class CategoryDAO {
     String url = "";
     public static final double oneSquareMeter = Double.valueOf(ConfigUtil.getProperty("one.square.meter", "0.092903"));
     private final Lock lock1 = new ReentrantLock();
+    private final Lock locktho1 = new ReentrantLock();
+    private final Lock lockphots1 = new ReentrantLock();
+    private final Lock lockaudivi1 = new ReentrantLock();
 
     public CategoryDAO() {
         dbconnection = DBConnection.getInstance();
@@ -781,20 +784,11 @@ public class CategoryDAO {
         return -1;
     }
 
-    public JSONArray getThoughts(String language) {
+    public JSONArray getbooks(String language) {
         String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM book");
 
         if (StringUtils.isNotBlank(language)) {
-            // selectcat = selectcat + " where category_id=" + id;
-            if (language.equalsIgnoreCase("English")) {
-                selectcat = selectcat + " where book_name_english IS NOT NULL";
-            }
-            if (language.equalsIgnoreCase("Urdu")) {
-                selectcat = selectcat + " where book_name_urdu IS NOT NULL";
-            }
-            if (language.equalsIgnoreCase("Hindi")) {
-                selectcat = selectcat + " where book_name_hindi IS NOT NULL";
-            }
+            selectcat = selectcat + " where book_type=" + language;
         }
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -804,6 +798,7 @@ public class CategoryDAO {
         JSONArray propertyArrayhindi = new JSONArray();
         JSONArray propertyArrayenglish = new JSONArray();
         JSONArray propertyArrayUrdu = new JSONArray();
+        JSONArray propertyArrayarra = new JSONArray();
         StringBuffer ob = new StringBuffer();
         lock1.lock();
         try {
@@ -818,43 +813,46 @@ public class CategoryDAO {
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_english")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                        int booktype = rs.getInt("book_type");
+                        if (booktype == 1) {
+                            propertyArrayenglish.put(property);
+                        } else if (booktype == 2) {
+                            propertyArrayhindi.put(property);
+                        } else if (booktype == 3) {
+                            propertyArrayUrdu.put(property);
+                        } else {
+                            propertyArrayarra.put(property);
+                        }
+
+                    } else if (language.equalsIgnoreCase("1")) {
+                        property.put(Constants.id, rs.getString(Constants.id));
+                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                         propertyArrayenglish.put(property);
-                        property = new JSONObject();
+                    } else if (language.equalsIgnoreCase("3")) {
                         property.put(Constants.id, rs.getString(Constants.id));
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_hindi")));
-                        propertyArrayhindi.put(property);
-                        property = new JSONObject();
-                        property.put(Constants.id, rs.getString(Constants.id));
-                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
-                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
-                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                         propertyArrayUrdu.put(property);
-                    } else if (language.equalsIgnoreCase("English")) {
-                        property.put(Constants.id, rs.getString(Constants.id));
-                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
-                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
-                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_english")));
-                        propertyArrayenglish.put(property);
-                    } else if (language.equalsIgnoreCase("Urdu")) {
-                        property.put(Constants.id, rs.getString(Constants.id));
-                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
-                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
-                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
-                        propertyArrayUrdu.put(property);
-                    } else if (language.equalsIgnoreCase("Hindi")) {
+                    } else if (language.equalsIgnoreCase("2")) {
                         property.put(Constants.id, rs.getString(Constants.id));
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
                         propertyArrayhindi.put(property);
-                        property.put("title", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
+                        property.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                    } else {
+                        property.put(Constants.id, rs.getString(Constants.id));
+                        property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
+                        property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                        property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        propertyArrayarra.put(property);
+                        property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     }
                 }
                 if (propertyArrayenglish.length() > 0) {
@@ -870,6 +868,11 @@ public class CategoryDAO {
                 if (propertyArrayUrdu.length() > 0) {
                     JSONObject urdu = new JSONObject();
                     urdu.put("urdu", propertyArrayUrdu);
+                    thoughts.put(urdu);
+                }
+                if (propertyArrayarra.length() > 0) {
+                    JSONObject urdu = new JSONObject();
+                    urdu.put("arabic", propertyArrayUrdu);
                     thoughts.put(urdu);
                 }
             }
@@ -928,4 +931,96 @@ public class CategoryDAO {
         return propertyArray;
     }
 
+   
+    public JSONArray getphotos() {
+        String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM photos");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+        StringBuffer ob = new StringBuffer();
+        lockphots1.lock();
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(selectcat);
+                rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("file", url + Utilities.nullToEmpty(rs.getString("image")));
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+
+            logger.error(" Got SQLException while sub_category_list" + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+
+            logger.error(" Got Exception while sub_category_list" + Utilities.getStackTrace(e));
+
+        } finally {
+            lockphots1.unlock();
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+
+   public JSONArray getContent(String type) {
+        String selectcat = ConfigUtil.getProperty("select.thoughts.query1", "SELECT * FROM content_type where type=" + type);
+
+        ResultSet rs = null;
+        ResultSet rs1 = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement pstmt1 = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+        StringBuffer ob = new StringBuffer();
+        locktho1.lock();
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(selectcat);
+                rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    JSONArray fileArray = new JSONArray();
+                    String id = rs.getString(Constants.id);
+                    property.put(Constants.id, id);
+                    property.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                    String selectcat1 = ConfigUtil.getProperty("select.thoughts.query1", "SELECT * FROM content_type_image where content_id=" + id);
+                    pstmt1 = objConn.prepareStatement(selectcat1);
+                    rs1 = pstmt1.executeQuery();
+                    while (rs1.next()) {
+                        JSONObject propertyfile = new JSONObject();
+                        propertyfile.put("id", Utilities.nullToEmpty(rs1.getString("id")));
+                        propertyfile.put("file", url + Utilities.nullToEmpty(rs1.getString("image")));
+                        fileArray.put(propertyfile);
+                    }
+                    property.put("files", fileArray);
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+
+            logger.error(" Got SQLException while sub_category_list" + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+
+            logger.error(" Got Exception while sub_category_list" + Utilities.getStackTrace(e));
+
+        } finally {
+            locktho1.unlock();
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+
+	
 }
