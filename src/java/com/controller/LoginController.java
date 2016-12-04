@@ -107,18 +107,70 @@ public class LoginController {
     String VIR_DIR = ConfigUtil.getProperty("VIR_DIR", "E:\\aqa\\menubook\\filepath");
 
     @RequestMapping(value = "/addcontent", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView addcontent(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "book_name_english", required = false) String book_name_english, @RequestParam(value = "book_name_hindi", required = false) String book_name_hindi, @RequestParam(value = "book_name_urdu", required = false) String book_name_urdu, @RequestParam(value = "category_id", required = false) String category_id, @RequestParam(value = "sub_category_id", required = false) String sub_category_id, @RequestParam(value = "published_date", required = false) String published_date, @RequestParam(value = "author_name", required = false) String author_name, HttpSession httpSession) {
+    public ModelAndView addcontent(@RequestParam("file[]") MultipartFile[] files, @RequestParam("content_file[]") MultipartFile[] content_file, @RequestParam(value = "book_title", required = false) String book_title, @RequestParam(value = "published_date", required = false) String published_date, @RequestParam(value = "author_name", required = false) String author_name, @RequestParam(value = "book_type", required = false) String book_type, HttpSession httpSession) {
         String response = "";
         String mainfilename = "";
         Content objContent = new Content();
         try {
-            objContent.setBook_name_english(book_name_english);
-            objContent.setBook_name_hindi(book_name_hindi);
-            objContent.setBook_name_urdu(book_name_urdu);
-            objContent.setCategory_id(category_id);
-            objContent.setSub_category_id(sub_category_id);
+            objContent.setBook_title(book_title);
             objContent.setPublished_date(published_date);
             objContent.setAuthor_name(author_name);
+            objContent.setBook_type(book_type);
+            
+            for (MultipartFile multipartfile : files) {
+                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+                    byte[] bytes = multipartfile.getBytes();
+                    File dir = new File(FILES_DIR);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    stream.close();
+//                    String newFilenmae = UUID.randomUUID() + ".jpg";
+//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+                    mainfilename = "/filepath/" + serverFile.getName();
+                    objContent.setFilePath(mainfilename);
+                }
+            }
+            for (MultipartFile multipartfile : content_file) {
+                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+                    byte[] bytes = multipartfile.getBytes();
+                    File dir = new File(FILES_DIR);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    stream.close();
+//                    String newFilenmae = UUID.randomUUID() + ".jpg";
+//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+                    mainfilename = "/filepath/" + serverFile.getName();
+                    objContent.setContent_file(mainfilename);
+                }
+            }
+            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
+            response = objUserService.addcontent(objContent);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("redirect:/list_book");
+    }
+    
+    @RequestMapping(value = "/edit_content", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView edit_content(@RequestParam(value = "book_id", required = false) String id, @RequestParam("file[]") MultipartFile[] files, @RequestParam("content_file[]") MultipartFile[] content_file, @RequestParam(value = "book_title", required = false) String book_title, @RequestParam(value = "book_type", required = false) String book_type, @RequestParam(value = "published_date", required = false) String published_date, @RequestParam(value = "author_name", required = false) String author_name, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setBook_title(book_title);
+            objContent.setPublished_date(published_date);
+            objContent.setAuthor_name(author_name);
+            objContent.setBook_type(book_type);
+            objContent.setId(id);
             for (MultipartFile multipartfile : files) {
                 if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
                     byte[] bytes = multipartfile.getBytes();
@@ -137,43 +189,7 @@ public class LoginController {
                     objContent.setFilePath(mainfilename);
                 }
             }
-            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
-            response = objUserService.addcontent(objContent);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ModelAndView("redirect:/list_book");
-    }
-
-//    @RequestMapping(value = "/edit_content", method = RequestMethod.POST, produces = {"application/json"})
-//    public String edit_content(@RequestBody String strJSON, HttpSession httpSession) {
-//        String response = "";
-//        try {
-//            Content objContent = Utilities.fromJson(strJSON, Content.class);
-//            response = objUserService.edit_content(objContent);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return response;
-//    }
-    
-    @RequestMapping(value = "/edit_content", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView edit_content(@RequestParam(value = "book_id", required = false) String id,@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "book_name_english", required = false) String book_name_english, @RequestParam(value = "book_name_hindi", required = false) String book_name_hindi, @RequestParam(value = "book_name_urdu", required = false) String book_name_urdu, @RequestParam(value = "category_id", required = false) String category_id, @RequestParam(value = "sub_category_id", required = false) String sub_category_id, @RequestParam(value = "published_date", required = false) String published_date, @RequestParam(value = "author_name", required = false) String author_name, HttpSession httpSession) {
-        String response = "";
-        String mainfilename = "";
-        Content objContent = new Content();
-        try {
-            objContent.setBook_name_english(book_name_english);
-            objContent.setBook_name_hindi(book_name_hindi);
-            objContent.setBook_name_urdu(book_name_urdu);
-            objContent.setCategory_id(category_id);
-            objContent.setSub_category_id(sub_category_id);
-            objContent.setPublished_date(published_date);
-            objContent.setAuthor_name(author_name);
-            objContent.setId(id);
-            for (MultipartFile multipartfile : files) {
+            for (MultipartFile multipartfile : content_file) {
                 if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
                     byte[] bytes = multipartfile.getBytes();
                     File dir = new File(FILES_DIR);
@@ -186,9 +202,8 @@ public class LoginController {
                     stream.close();
 //                    String newFilenmae = UUID.randomUUID() + ".jpg";
 //                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-
                     mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setFilePath(mainfilename);
+                    objContent.setContent_file(mainfilename);
                 }
             }
             //  Content objContent = Utilities.fromJson(strJSON, Content.class);

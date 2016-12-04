@@ -10,39 +10,14 @@
         </ul>
         <div class="container-fluid">
             <div class="row-fluid">
-				<br><br><br>
-				<div class="well">
-					     <form:form method="post" onsubmit="return Categorysave();" action="edit_content"  enctype="multipart/form-data">
-
+		<br><br><br>
+		<form:form method="post" onsubmit="return Categorysave();" action="edit_content"  enctype="multipart/form-data">
+                    <input type="hidden" id="book_id" name="book_id">
+                    <div class="well">
 					<div class="row-fluid">
 						<div class="span6">
-							<div class="span4">Category*</div>
-                                                        <select id="category_id" name="category_id" onchange="get_sub_category(this.value)">
-                                                            <option value="">Select Category</option>
-							</select>
-						</div>
-						<div class="span6">
-							<div class="span4">Sub Category*</div>
-                                                        <select id="sub_category_id" name="sub_category_id">
-                                                            
-							</select>
-						</div>
-					</div>
-					<div class="row-fluid">
-						<div class="span6">
-							<div class="span4">Book Name English*</div>
-                                                        <input type="text" id="book_name_english" name="book_name_english" placeholder="Book Name English Code" class="input-xlarge">
-						</div>
-						<div class="span6">
-							<div class="span4">Book Name Hindi*</div>
-							<input type="text" id="book_name_hindi" name="book_name_hindi" placeholder="Book Name Hindi" class="input-xlarge">
-						</div>
-					</div>
-					
-					<div class="row-fluid">
-						<div class="span6">
-							<div class="span4">Book Name Urdu*</div>
-                                                        <input type="text" id="book_name_urdu" name="book_name_urdu" placeholder="Book Name Urdu" class="input-xlarge">
+							<div class="span4">Book Title*</div>
+                                                        <input type="text" id="book_title" name="book_title" placeholder="Book Title" class="input-xlarge">
 						</div>
 						<div class="span6">
 							<div class="span4">Published Date*</div>
@@ -56,126 +31,76 @@
                                                         <input type="text" id="author_name" name="author_name" placeholder="Author Name" class="input-xlarge">
 						</div>
 						<div class="span6">
+							<div class="span4">Language Type*</div>
+                                                        <select id="book_type" name="book_type">
+                                                            <option value="">Select Book Type</option>
+                                                            <option value="1">English</option>
+                                                            <option value="2">Hindi</option>
+                                                            <option value="3">Urdu</option>
+                                                            <option value="4">Arabic</option>
+							</select>
 						</div>
 					</div>
-                                    					<div class="row-fluid">
-                                                <div class="span6">
-							<div class="span4">Upload File*</div>
-                                         <input type="file" id="excel" name="file[]" class="input-xlarge" style="border: 1px solid #ccc;">
-                     			</div>
-						<div class="span6">
-                                                    <a id="link" target="_blank">File Link</a>
-						</div>
+                                    					
+					<div class="row-fluid">
+                                            <div class="span6">
+						<div class="span4">Cover Image*</div>
+                                                <input type="file" id="excel" name="file[]" class="input-xlarge" style="border: 1px solid #ccc;">
+                                            </div>
+                                            <div class="span6">
+						<a id="link" target="_blank">Cover Image Link</a>
+                                            </div>
 					</div>
-                                                 <input type="hidden" id="book_id" name="book_id">
-			    
+                                        <div class="row-fluid">
+                                            <div class="span6">
+						<div class="span4">Book Content File*</div>
+                                                <input type="file" id="content_file" name="content_file[]" class="input-xlarge" style="border: 1px solid #ccc;">
+                                            </div>
+                                            <div class="span6">
+                                                <a id="link2" target="_blank">Book Content Link</a>
+                                            </div>
+					</div>
                                         <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
 					
-				</div>
-                  </form:form>
+                    </div>
+                </form:form>
 <%@include file="footer.jsp" %> 
 <script type="text/javascript">
-category_id();
-    function category_id() 
-    {
-        $.ajax({
-            url: "getcategory",
-            type: "GET",
-            dataType: "json",
-            async: false,
-            contentType: "application/json",
-            success: function (response)
-            {
-                response = response.response.propertyTypes;
-                $.each(response, function (idx, rec) {
-                    $('<option/>', {
-                        'value': rec.id,
-                        'text': rec.name
-                    }).appendTo('#category_id');
-                });
-            }
-        });
-    }
-    function get_sub_category(category_id)
-    {
-        $.ajax({
-            url: "get_sub_category?id="+category_id,
-            type: "GET",
-            dataType: "json",
-            async: false,
-            contentType: "application/json",
-            success: function (response)
-            {
-                response = response.response.propertyTypes;
-                $('#sub_category_id').html('<option value="">Select Sub Category</option>');
-                $.each(response, function (idx, rec) {
-                    $('<option/>', {
-                        'value': rec.id,
-                        'text': rec.name
-                    }).appendTo('#sub_category_id');
-                });
-            }
-        });
-    }
     $(document).ready(function () {
         json =${restdet};
         loadresjson(json); 
     });
     function loadresjson(obj) 
     {
-        $("#book_name_english").val(obj.book_name_english);
-        $("#book_name_hindi").val(obj.book_name_hindi);
-        $("#book_name_urdu").val(obj.book_name_urdu);
-        $("#category_id").val(obj.category_id);
-        get_sub_category(obj.category_id);
-        $("#sub_category_id").val(obj.sub_category_id);
+        $("#book_title").val(obj.book_title);
+        $("#book_type").val(obj.book_type);
         $("#published_date").val(obj.published_date);
         $("#author_name").val(obj.author_name);
      
         $("#link").attr("href", obj.file_path);
-        //$("#link").html(obj.file_path);
+        $("#link2").attr("href", obj.book_url);
     }
-           function Categorysave(){
-
+            function Categorysave(){
                 var contentnamejson = {};
                 iserror = false;
-                book_name_english = $("#book_name_english").val();
-                book_name_hindi = $("#book_name_hindi").val();
-                book_name_urdu = $("#book_name_urdu").val();
-                category_id = $("#category_id").val();
-                sub_category_id = $("#sub_category_id").val();
+                book_title = $("#book_title").val();
+                book_type = $("#book_type").val();
                 published_date = $("#published_date").val();
                 author_name = $("#author_name").val();
+                excel = $("#excel").val();
+                content_file = $("#content_file").val();
                 
-                if (book_name_english == '') {
-                    addclass('book_name_english');
+                if (book_title == '') {
+                    addclass('book_title');
                     iserror = true;
                 } else {
-                    removeclass('book_name_english');
+                    removeclass('book_title');
                 }
-                if (book_name_hindi == '') {
-                    addclass('book_name_hindi');
+                if (book_type == '') {
+                    addclass('book_type');
                     iserror = true;
                 } else {
-                    removeclass('book_name_hindi');
-                }
-                if (book_name_urdu == '') {
-                    addclass('book_name_urdu');
-                    iserror = true;
-                } else {
-                    removeclass('book_name_urdu');
-                }
-                if (category_id == '') {
-                    addclass('category_id');
-                    iserror = true;
-                } else {
-                    removeclass('category_id');
-                }
-                if (sub_category_id == '') {
-                    addclass('sub_category_id');
-                    iserror = true;
-                } else {
-                    removeclass('sub_category_id');
+                    removeclass('book_type');
                 }
                 if (published_date == '') {
                     addclass('published_date');
@@ -191,50 +116,10 @@ category_id();
                 }
                 if (iserror) {
                     return false;
-                }else{book_id
+                }else{
                     id = getParameterByName("id");
-                       $("#book_id").val(id);
-                     return true;
+                    $("#book_id").val(id);
+                    return true;
                 }
-                contentnamejson['book_name_english'] = book_name_english;
-                contentnamejson['book_name_hindi'] = book_name_hindi;
-                contentnamejson['book_name_urdu'] = book_name_urdu;
-                contentnamejson['category_id'] = category_id;
-                contentnamejson['sub_category_id'] = sub_category_id;
-                contentnamejson['published_date'] = published_date;
-                contentnamejson['author_name'] = author_name;
-                contentnamejson['id'] = getParameterByName("id");
-                
-                //id = getParameterByName("id");
-                //alert(id);
-                       var content = JSON.stringify(contentnamejson);
-                       //alert(content);
-                        $.ajax({
-                            url: "edit_content",
-                            type: "POST",
-                            dataType: "json",
-                            data:content,
-                            async: false,
-                            contentType: "application/json",
-                            success: function (data)
-                            {                      
-                                code = data.response.code;
-                                if (code == 0) {
-                                    swal({title: "Success", text: "Book updated Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
-                                        if (isConfirm) {
-                                            window.location = "list_book";
-                                        }
-                                    });
-                                } else if (code == 108) {
-                                    sweetAlert('Oops...', 'Invalid UserId!', 'error');
-
-                                } else if (code == 109) {
-                                    sweetAlert('Oops...', 'Invalid Password!', 'error');
-
-                                } else {
-                                    sweetAlert('Oops...', 'Something went wrong!', 'error');
-                                }
-                            }
-                        });
-                    }
+            }
 </script>

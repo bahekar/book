@@ -31,6 +31,9 @@ public class Content {
     private String type;
     private String cid;
     private String ctid;
+    private String book_title;
+    private String content_file;
+    private String book_type;
     /**
      * @return the contentname
      */
@@ -323,5 +326,47 @@ public class Content {
      */
     public void setCtid(String ctid) {
         this.ctid = ctid;
+    }
+
+    /**
+     * @return the book_title
+     */
+    public String getBook_title() {
+        return book_title;
+    }
+
+    /**
+     * @param book_title the book_title to set
+     */
+    public void setBook_title(String book_title) {
+        this.book_title = book_title;
+    }
+
+    /**
+     * @return the content_file
+     */
+    public String getContent_file() {
+        return content_file;
+    }
+
+    /**
+     * @param content_file the content_file to set
+     */
+    public void setContent_file(String content_file) {
+        this.content_file = content_file;
+    }
+
+    /**
+     * @return the book_type
+     */
+    public String getBook_type() {
+        return book_type;
+    }
+
+    /**
+     * @param book_type the book_type to set
+     */
+    public void setBook_type(String book_type) {
+        this.book_type = book_type;
     }
 }

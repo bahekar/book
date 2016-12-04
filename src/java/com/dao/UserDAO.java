@@ -67,7 +67,7 @@ public class UserDAO {
     static Log logger = LogFactory.getLog(UserDAO.class);
 
     public int addcontent(Content objContent) {
-        String insertQuery = ConfigUtil.getProperty("store.book.query", "INSERT INTO `adminbook`.`book`(`book_name_english`,`book_name_hindi`,`book_name_urdu`,`category_id`,`sub_category_id`,`published_date`,`author_name`,`file_path`) VALUES (?,?,?,?,?,?,?,?)");
+        String insertQuery = ConfigUtil.getProperty("store.book.query", "INSERT INTO `adminbook`.`book`(`title`,`published_date`,`author_name`,`file_path`,`book_type`,`book_url`) VALUES (?,?,?,?,?,?)");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -77,20 +77,17 @@ public class UserDAO {
 
                 pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
 
-                pstmt.setString(1, objContent.getBook_name_english());
-                pstmt.setString(2, objContent.getBook_name_hindi());
-                pstmt.setString(3, objContent.getBook_name_urdu());
-                pstmt.setString(4, objContent.getCategory_id());
-                pstmt.setString(5, objContent.getSub_category_id());
-                pstmt.setString(6, objContent.getPublished_date());
-                pstmt.setString(7, objContent.getAuthor_name());
-                pstmt.setString(8, objContent.getFilePath());
+                pstmt.setString(1, objContent.getBook_title());
+                pstmt.setString(2, objContent.getPublished_date());
+                pstmt.setString(3, objContent.getAuthor_name());
+                pstmt.setString(4, objContent.getFilePath());
+                pstmt.setString(5, objContent.getBook_type());
+                pstmt.setString(6, objContent.getContent_file());
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
                     nRes = rs.getInt(1);
                 }
-
                 return nRes;
             }
         } catch (SQLException sqle) {
@@ -108,7 +105,7 @@ public class UserDAO {
     }
 
     public int edit_content(Content objContent) {
-        String updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `book_name_english`=?,`book_name_hindi`=?,`book_name_urdu`=?,`category_id`=?,`sub_category_id`=?,`published_date`=?,`author_name`=? where id=? ");
+        String updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `title`=?,`published_date`=?,`author_name`=?,`book_type`=? where id=? ");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -116,25 +113,36 @@ public class UserDAO {
             objConn = DBConnection.getInstance().getConnection();
             if (objConn != null) {
 
-                if (StringUtils.isBlank(objContent.getFilePath())) {
+                if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
                     pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
-                } else {
-                    updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `book_name_english`=?,`book_name_hindi`=?,`book_name_urdu`=?,`category_id`=?,`sub_category_id`=?,`published_date`=?,`author_name`=?,`file_path`=? where id=? ");
+                }else if (StringUtils.isNotBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
+                    updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `title`=?,`published_date`=?,`author_name`=?,`book_type`=?,`file_path`=? where id=? ");
+                    pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+                }else if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isNotBlank(objContent.getContent_file())) {
+                    updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `title`=?,`published_date`=?,`author_name`=?,`book_type`=?,`book_url`=? where id=? ");
+                    pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+                }else {
+                    updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `title`=?,`published_date`=?,`author_name`=?,`book_type`=?,`file_path`=?,`book_url`=? where id=? ");
                     pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
                 }
 
-                pstmt.setString(1, objContent.getBook_name_english());
-                pstmt.setString(2, objContent.getBook_name_hindi());
-                pstmt.setString(3, objContent.getBook_name_urdu());
-                pstmt.setString(4, objContent.getCategory_id());
-                pstmt.setString(5, objContent.getSub_category_id());
-                pstmt.setString(6, objContent.getPublished_date());
-                pstmt.setString(7, objContent.getAuthor_name());
-                if (StringUtils.isBlank(objContent.getFilePath())) {
-                    pstmt.setString(8, objContent.getId());
-                } else {
-                    pstmt.setString(8, objContent.getFilePath());
-                    pstmt.setString(9, objContent.getId());
+                pstmt.setString(1, objContent.getBook_title());
+                pstmt.setString(2, objContent.getPublished_date());
+                pstmt.setString(3, objContent.getAuthor_name());
+                pstmt.setString(4, objContent.getBook_type());
+                
+                if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
+                    pstmt.setString(5, objContent.getId());
+                }else if (StringUtils.isNotBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
+                    pstmt.setString(5, objContent.getFilePath());
+                    pstmt.setString(6, objContent.getId());
+                }else if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isNotBlank(objContent.getContent_file())) {
+                    pstmt.setString(5, objContent.getContent_file());
+                    pstmt.setString(6, objContent.getId());
+                }else {
+                    pstmt.setString(5, objContent.getFilePath());
+                    pstmt.setString(6, objContent.getContent_file());
+                    pstmt.setString(7, objContent.getId());
                 }
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
@@ -196,9 +204,7 @@ public class UserDAO {
         PreparedStatement pstmt = null;
         Connection objConn = null;
         JSONArray propertyArray = new JSONArray();
-
         try {
-
             objConn = DBConnection.getInstance().getConnection();
             if (objConn != null) {
                 pstmt = objConn.prepareStatement(query);
@@ -207,12 +213,11 @@ public class UserDAO {
                 while (rs.next()) {
                     JSONObject property = new JSONObject();
                     property.put(Constants.id, rs.getString(Constants.id));
-                    property.put("book_name_english", Utilities.nullToEmpty(rs.getString("book_name_english")));
-                    property.put("book_name_hindi", Utilities.nullToEmpty(rs.getString("book_name_hindi")));
-                    property.put("book_name_urdu", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
+                    property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                     property.put("published_date", Utilities.nullToEmpty(rs.getString("published_date")));
                     property.put("file_path", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                    property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                     property.put(Constants.createdOn, rs.getString("created_datetime"));
                     propertyArray.put(property);
                 }
@@ -862,14 +867,12 @@ public class UserDAO {
 
                 rs = pstmt.executeQuery();
                 if (rs.next()) {
-                    neighborhoodObj.put("book_name_english", Utilities.nullToEmpty(rs.getString("book_name_english")));
-                    neighborhoodObj.put("book_name_hindi", Utilities.nullToEmpty(rs.getString("book_name_hindi")));
-                    neighborhoodObj.put("book_name_urdu", Utilities.nullToEmpty(rs.getString("book_name_urdu")));
-                    neighborhoodObj.put("category_id", Utilities.nullToEmpty(rs.getString("category_id")));
-                    neighborhoodObj.put("sub_category_id", Utilities.nullToEmpty(rs.getString("sub_category_id")));
+                    neighborhoodObj.put("book_title", Utilities.nullToEmpty(rs.getString("title")));
+                    neighborhoodObj.put("book_type", Utilities.nullToEmpty(rs.getString("book_type")));
                     neighborhoodObj.put("published_date", Utilities.nullToEmpty(rs.getString("published_date")));
                     neighborhoodObj.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                     neighborhoodObj.put("file_path", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                    neighborhoodObj.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                 }
             }
         } catch (Exception e) {

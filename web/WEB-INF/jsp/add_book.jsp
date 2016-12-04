@@ -11,11 +11,10 @@
         </ul>
         <div class="container-fluid">
             <div class="row-fluid">
-				<br><br><br>
-                                        <form:form method="post" onsubmit="return Categorysave();" action="addcontent"  enctype="multipart/form-data">
+		<br><br><br>
+                <form:form method="post" onsubmit="return Categorysave();" action="addcontent"  enctype="multipart/form-data">
 
-				<div class="well">
-										
+                    <div class="well">
 					<div class="row-fluid">
 						<div class="span6">
 							<div class="span4">Book Title*</div>
@@ -33,7 +32,7 @@
                                                         <input type="text" id="author_name" name="author_name" placeholder="Author Name" class="input-xlarge">
 						</div>
 						<div class="span6">
-							<div class="span4">Book Type*</div>
+							<div class="span4">Language Type*</div>
                                                         <select id="book_type" name="book_type">
                                                             <option value="">Select Book Type</option>
                                                             <option value="1">English</option>
@@ -45,12 +44,14 @@
 					</div>
                                     					
 					<div class="row-fluid">
-                                                <div class="span6">
-							<div class="span4">Upload File*</div>
-                                         <input type="file" id="excel" name="file[]" class="input-xlarge" style="border: 1px solid #ccc;">
-                     			</div>
-						<div class="span6">
-						</div>
+                                            <div class="span6">
+						<div class="span4">Cover Image*</div>
+                                                <input type="file" id="excel" name="file[]" class="input-xlarge" style="border: 1px solid #ccc;">
+                                            </div>
+                                            <div class="span6">
+						<div class="span4">Book Content File*</div>
+                                                <input type="file" id="content_file" name="content_file[]" class="input-xlarge" style="border: 1px solid #ccc;">
+                                            </div>
 					</div>
                                         <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
 					
@@ -58,13 +59,15 @@
                               </form:form>
 <%@include file="footer.jsp" %> 
 <script type="text/javascript">
-          function Categorysave()  {
+            function Categorysave()  {
                 var contentnamejson = {};
                 iserror = false;
                 book_title = $("#book_title").val();
                 book_type = $("#book_type").val();
                 published_date = $("#published_date").val();
                 author_name = $("#author_name").val();
+                excel = $("#excel").val();
+                content_file = $("#content_file").val();
                 
                 if (book_title == '') {
                     addclass('book_title');
@@ -90,46 +93,23 @@
                 } else {
                     removeclass('author_name');
                 }
+                if (excel == '') {
+                    addclass('excel');
+                    iserror = true;
+                } else {
+                    removeclass('excel');
+                }
+                if (content_file == '') {
+                    addclass('content_file');
+                    iserror = true;
+                } else {
+                    removeclass('content_file');
+                }
                 if (iserror) {
                     return false;
                 }else{
                      return true;
                 }
-                contentnamejson['book_title'] = book_title;
-                contentnamejson['book_type'] = book_type;
-                contentnamejson['published_date'] = published_date;
-                contentnamejson['author_name'] = author_name;
-                
-                       var content_value = JSON.stringify(contentnamejson);
-                        $.ajax({
-                            url: "addcontent",
-                            type: "POST",
-                            dataType: "json",
-                            data:content_value,
-                            async: false,
-                            contentType: "application/json",
-                            success: function (data)
-                            {
-                                code = data.response.code;
-                                //alert(code);
-                                if (code == 0) {
-                                    swal({title: "Success", text: "Book added Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
-                                        if (isConfirm) {
-                                            //alert(isConfirm);
-                                            window.location = 'list_book';
-                                        }
-                                    });
-                                } else if (code == 108) {
-                                    sweetAlert('Oops...', 'Invalid UserId!', 'error');
-
-                                } else if (code == 109) {
-                                    sweetAlert('Oops...', 'Invalid Password!', 'error');
-
-                                } else {
-                                    sweetAlert('Oops...', 'Something went wrong!', 'error');
-                                }
-                            }
-                        });
-                        }
+            }
                     
 </script>
