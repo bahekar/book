@@ -481,5 +481,61 @@ public class CategoryController {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
         }
     }
+    
+    @RequestMapping(value = "/list_magazine", method = RequestMethod.GET)
+    public Object list_magazine(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("list_magazine");
+        return model;
+    }
+
+    @RequestMapping(value = "/add_magazine", method = RequestMethod.GET)
+    public Object add_magazine(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("add_magazine");
+        return model;
+    }
+    
+    @RequestMapping(value = "/list_thoughts", method = RequestMethod.GET)
+    public Object list_thoughts(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("list_thoughts");
+        return model;
+    }
+
+    @RequestMapping(value = "/add_thoughts", method = RequestMethod.GET)
+    public Object add_thoughts(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("add_thoughts");
+        return model;
+    }
+    
+    @RequestMapping(value = "/list_audio", method = RequestMethod.GET)
+    public Object list_audio(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("list_audio");
+        return model;
+    }
+
+    @RequestMapping(value = "/add_audio", method = RequestMethod.GET)
+    public Object add_audio(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("add_audio");
+        return model;
+    }
+    
+    @RequestMapping(value = "/list_video", method = RequestMethod.GET)
+    public Object list_video(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("list_video");
+        return model;
+    }
+
+    @RequestMapping(value = "/add_video", method = RequestMethod.GET)
+    public Object add_video(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("add_video");
+        return model;
+    }
 
 }
