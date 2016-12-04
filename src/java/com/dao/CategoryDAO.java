@@ -953,7 +953,7 @@ public class CategoryDAO {
                 while (rs.next()) {
                     JSONObject property = new JSONObject();
                     property.put(Constants.id, rs.getString(Constants.id));
-                    property.put("file", url + Utilities.nullToEmpty(rs.getString("image")));
+                    property.put("image", url + Utilities.nullToEmpty(rs.getString("image")));
                     propertyArray.put(property);
                 }
             }
@@ -1002,7 +1002,7 @@ public class CategoryDAO {
                     while (rs1.next()) {
                         JSONObject propertyfile = new JSONObject();
                         propertyfile.put("id", Utilities.nullToEmpty(rs1.getString("id")));
-                        propertyfile.put("file", url + Utilities.nullToEmpty(rs1.getString("image")));
+                        propertyfile.put("image", url + Utilities.nullToEmpty(rs1.getString("image")));
                         fileArray.put(propertyfile);
                     }
                     property.put("files", fileArray);

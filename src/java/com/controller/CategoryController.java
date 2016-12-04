@@ -420,13 +420,13 @@ public class CategoryController {
         String transId = UUID.randomUUID().toString();
 
         try {
-            JSONObject objRequest = new JSONObject();
-            objRequest.put("code", "0");
-            objRequest.put("description", "success");
+//            JSONObject objRequest = new JSONObject();
+//            objRequest.put("code", "0");
+//            objRequest.put("description", "success");
             strResult = objUserService.getAuthors();
 
-            objRequest.put("authorslist", strResult);
-            return objRequest.toString().getBytes("UTF-8");
+//            objRequest.put("authorslist", strResult);
+            return strResult.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);
             return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
@@ -443,13 +443,13 @@ public class CategoryController {
         String transId = UUID.randomUUID().toString();
 
         try {
-            JSONObject objRequest = new JSONObject();
-            objRequest.put("code", "0");
-            objRequest.put("description", "success");
+//            JSONObject objRequest = new JSONObject();
+//            objRequest.put("code", "0");
+//            objRequest.put("description", "success");
             strResult = objUserService.getphotos();
 
-            objRequest.put("photoslist", strResult);
-            return objRequest.toString().getBytes("UTF-8");
+//            objRequest.put("photoslist", strResult);
+            return strResult.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);
             return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
@@ -466,13 +466,13 @@ public class CategoryController {
         String transId = UUID.randomUUID().toString();
 
         try {
-            JSONObject objRequest = new JSONObject();
-            objRequest.put("code", "0");
-            objRequest.put("description", "success");
+//            JSONObject objRequest = new JSONObject();
+//            objRequest.put("code", "0");
+//            objRequest.put("description", "success");
             strResult = objUserService.getContent(type);
 
-            objRequest.put("contentlist", strResult);
-            return objRequest.toString().getBytes("UTF-8");
+//            objRequest.put("contentlist", strResult);
+            return strResult.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);
             return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
