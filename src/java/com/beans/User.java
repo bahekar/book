@@ -14,10 +14,13 @@ public class User {
     private String id;
 
     private String user_id;
-
-    private String password;
-private String fullname;
+    private String email;
+    private String name;
     private String mobile;
+    private String question;
+    private String password;
+    private String fullname;
+
     private String errorMessage;
 
     /**
@@ -82,6 +85,62 @@ private String fullname;
      */
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the question
+     */
+    public String getQuestion() {
+        return question;
+    }
+
+    /**
+     * @param question the question to set
+     */
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
 }

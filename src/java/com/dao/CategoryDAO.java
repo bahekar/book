@@ -6,6 +6,7 @@
 package com.dao;
 
 import com.beans.RssBean;
+import com.beans.User;
 import com.common.ConfigUtil;
 import com.common.Constants;
 import com.common.DBConnection;
@@ -813,7 +814,7 @@ public class CategoryDAO {
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                          property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                         int booktype = rs.getInt("book_type");
                         if (booktype == 1) {
@@ -861,24 +862,24 @@ public class CategoryDAO {
                     }
                 }
                 if (propertyArrayenglish.length() > 0) {
-                   // JSONObject english = new JSONObject();
+                    // JSONObject english = new JSONObject();
                     thoughts.put("english", propertyArrayenglish);
-                   // thoughts.put(english);
+                    // thoughts.put(english);
                 }
                 if (propertyArrayhindi.length() > 0) {
-                   // JSONObject hindi = new JSONObject();
+                    // JSONObject hindi = new JSONObject();
                     thoughts.put("hindi", propertyArrayhindi);
-                  //  thoughts.put(hindi);
+                    //  thoughts.put(hindi);
                 }
                 if (propertyArrayUrdu.length() > 0) {
-                   // JSONObject urdu = new JSONObject();
+                    // JSONObject urdu = new JSONObject();
                     thoughts.put("urdu", propertyArrayUrdu);
-                   // thoughts.put(urdu);
+                    // thoughts.put(urdu);
                 }
                 if (propertyArrayarra.length() > 0) {
-                   // JSONObject urdu = new JSONObject();
+                    // JSONObject urdu = new JSONObject();
                     thoughts.put("arabic", propertyArrayUrdu);
-                   // thoughts.put(urdu);
+                    // thoughts.put(urdu);
                 }
             }
         } catch (SQLException sqle) {
@@ -1019,6 +1020,79 @@ public class CategoryDAO {
 
         } finally {
             locktho1.unlock();
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+
+    public int addfaq(User user) throws SQLException, Exception {
+        String insertQuery = ConfigUtil.getProperty("store.faq.data.query", "INSERT INTO `adminbook`.`faq`(`name`,`email`,`msisdn`,`question`) VALUES (?,?,?,?)");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+
+        Connection objConn = null;
+        int status = 0;
+        try {
+            objConn = dbconnection.getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, user.getName());
+                pstmt.setString(2, user.getEmail());
+                pstmt.setString(3, user.getMobile());
+                pstmt.setString(4, user.getQuestion());
+                status = pstmt.executeUpdate();
+            } else {
+                logger.error("addUserDetails(): connection object is null");
+            }
+        } catch (SQLException sqle) {
+            logger.error("addUserDetails() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("addUserDetails() Got Exception : " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return status;
+    }
+
+    public JSONArray getFAQ(User user) {
+        String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM faq");
+        selectcat = selectcat + " where name='" + user.getName() + "' and email='" + user.getEmail() + "' and msisdn='" + user.getMobile() + "'";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+        StringBuffer ob = new StringBuffer();
+        lockphots1.lock();
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(selectcat);
+                rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("question", Utilities.nullToEmpty(rs.getString("question")));
+                    property.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
+                    property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+
+            logger.error(" Got SQLException while sub_category_list" + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+
+            logger.error(" Got Exception while sub_category_list" + Utilities.getStackTrace(e));
+
+        } finally {
+            lockphots1.unlock();
             if (objConn != null) {
                 dbconnection.closeConnection(rs, pstmt, objConn);
             }

@@ -6,8 +6,14 @@
 package com.controller;
 
 import com.beans.RssBean;
+import com.beans.User;
 import static com.common.ResponseCodes.ServiceErrorCodes.GENERIC_ERROR;
 import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_JSON;
+import static com.common.ResponseCodes.ServiceErrorCodes. INVALID_EMAILID;
+import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_Q;
+import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_MOBILE_NUMBER;
+import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_PASSWORD;
+import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_USERID;
 import com.common.Utilities;
 import com.google.gson.JsonSyntaxException;
 import com.service.CategoryService;
@@ -17,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -482,7 +489,7 @@ public class CategoryController {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
         }
     }
-    
+
     @RequestMapping(value = "/list_magazine", method = RequestMethod.GET)
     public Object list_magazine(HttpServletRequest request) {
         ModelAndView model = new ModelAndView();
@@ -496,7 +503,7 @@ public class CategoryController {
         model.setViewName("add_magazine");
         return model;
     }
-    
+
     @RequestMapping(value = "/list_thoughts", method = RequestMethod.GET)
     public Object list_thoughts(HttpServletRequest request) {
         ModelAndView model = new ModelAndView();
@@ -510,7 +517,7 @@ public class CategoryController {
         model.setViewName("add_thoughts");
         return model;
     }
-    
+
     @RequestMapping(value = "/list_audio", method = RequestMethod.GET)
     public Object list_audio(HttpServletRequest request) {
         ModelAndView model = new ModelAndView();
@@ -524,7 +531,7 @@ public class CategoryController {
         model.setViewName("add_audio");
         return model;
     }
-    
+
     @RequestMapping(value = "/list_video", method = RequestMethod.GET)
     public Object list_video(HttpServletRequest request) {
         ModelAndView model = new ModelAndView();
@@ -537,6 +544,66 @@ public class CategoryController {
         ModelAndView model = new ModelAndView();
         model.setViewName("add_video");
         return model;
+    }
+
+    @RequestMapping(value = "/api/addfaq", method = RequestMethod.POST, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+    public String addfaq(@RequestBody String strJSON, HttpSession httpSession) {
+        User user = null;
+        String strResponse = null;
+        String transId = UUID.randomUUID().toString();
+        try {
+            user = Utilities.fromJson(strJSON, User.class);
+            if (StringUtils.isBlank(user.getName())) {
+                return Utilities.prepareReponse(INVALID_USERID.getCode(), INVALID_USERID.DESC(), transId);
+            }
+
+            // LoginType=1 is direct signup, so password is mandatory
+            if (StringUtils.isBlank(user.getEmail())) {
+                return Utilities.prepareReponse(INVALID_EMAILID.getCode(), INVALID_EMAILID.DESC(), transId);
+            }
+            if (StringUtils.isBlank(user.getMobile()) || !StringUtils.isNumeric(user.getMobile())) {
+                return Utilities.prepareReponse(INVALID_MOBILE_NUMBER.getCode(), INVALID_MOBILE_NUMBER.DESC(), transId);
+            }
+            if (StringUtils.isBlank(user.getQuestion())) {
+                return Utilities.prepareReponse(INVALID_Q.getCode(), INVALID_Q.DESC(), transId);
+            }
+            strResponse = objUserService.addfaq(user, transId);
+        } catch (JsonSyntaxException je) {
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId);
+        } catch (Exception e) {
+            logger.error("Exception in signup(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId);
+        }
+
+        return strResponse;
+    }
+
+    @RequestMapping(value = "/api/getfaq", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getfaq(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "mobile", required = false) String mobile, @RequestParam(value = "email", required = false) String email, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONArray strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+//            JSONObject objRequest = new JSONObject();
+//            objRequest.put("code", "0");
+//            objRequest.put("description", "success");
+            User user = new User();
+            user.setName(name);
+            user.setMobile(mobile);
+            user.setEmail(email);
+            strResult = objUserService.getFAQ(user);
+
+//            objRequest.put("contentlist", strResult);
+            System.out.println("svn test");
+            return strResult.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
     }
 
 }

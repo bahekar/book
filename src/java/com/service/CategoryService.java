@@ -6,6 +6,7 @@
 package com.service;
 
 import com.beans.RssBean;
+import com.beans.User;
 import com.common.ResponseCodes;
 import static com.common.ResponseCodes.ServiceErrorCodes.GENERIC_ERROR;
 import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_DATA;
@@ -302,5 +303,25 @@ public class CategoryService {
 
     public JSONArray getContent(String type) {
         return objUserDAO.getContent(type);
+    }
+    
+      public String addfaq(User user, String strTid) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        try {
+            isUpdated = objUserDAO.addfaq(user);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            }
+        } catch (Exception e) {
+            logger.error("Exception in addUserDetails(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    public JSONArray getFAQ(User user) {
+        return objUserDAO.getFAQ(user);
     }
 }
