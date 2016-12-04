@@ -1002,7 +1002,7 @@ public class CategoryDAO {
                     while (rs1.next()) {
                         JSONObject propertyfile = new JSONObject();
                         propertyfile.put("id", Utilities.nullToEmpty(rs1.getString("id")));
-                        propertyfile.put("image", url + Utilities.nullToEmpty(rs1.getString("image")));
+                        propertyfile.put("file_url", url + Utilities.nullToEmpty(rs1.getString("image")));
                         fileArray.put(propertyfile);
                     }
                     property.put("files", fileArray);
