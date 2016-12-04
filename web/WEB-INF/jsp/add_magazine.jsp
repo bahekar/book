@@ -3,11 +3,11 @@
     
     <div class="content">
         <div class="header">
-            <h1 class="page-title">Add Book</h1>
+            <h1 class="page-title">Add Magazine</h1>
         </div>
         <ul class="breadcrumb">
             <li><a href="home">Home</a> <span class="divider">/</span></li>
-            <li>Add Book</li>
+            <li>Add Magazine</li>
         </ul>
         <div class="container-fluid">
             <div class="row-fluid">
@@ -18,32 +18,13 @@
 										
 					<div class="row-fluid">
 						<div class="span6">
-							<div class="span4">Book Title*</div>
-                                                        <input type="text" id="book_title" name="book_title" placeholder="Book Title" class="input-xlarge">
+							<div class="span4">Title*</div>
+                                                        <input type="text" id="title" name="title" placeholder="Title" class="input-xlarge">
 						</div>
 						<div class="span6">
-							<div class="span4">Published Date*</div>
-                                                        <input type="text" id="published_date" autocomplete="off" name="published_date" placeholder="Published Date" class="input-xlarge">
 						</div>
 					</div>
 					
-					<div class="row-fluid">
-                                                <div class="span6">
-							<div class="span4">Author Name*</div>
-                                                        <input type="text" id="author_name" name="author_name" placeholder="Author Name" class="input-xlarge">
-						</div>
-						<div class="span6">
-							<div class="span4">Book Type*</div>
-                                                        <select id="book_type" name="book_type">
-                                                            <option value="">Select Book Type</option>
-                                                            <option value="1">English</option>
-                                                            <option value="2">Hindi</option>
-                                                            <option value="3">Urdu</option>
-                                                            <option value="4">Arabic</option>
-							</select>
-						</div>
-					</div>
-                                    					
 					<div class="row-fluid">
                                                 <div class="span6">
 							<div class="span4">Upload File*</div>
@@ -61,42 +42,32 @@
           function Categorysave()  {
                 var contentnamejson = {};
                 iserror = false;
-                book_title = $("#book_title").val();
-                book_type = $("#book_type").val();
-                published_date = $("#published_date").val();
-                author_name = $("#author_name").val();
+                title = $("#title").val();
+                excel = $("#excel").val();
                 
-                if (book_title == '') {
-                    addclass('book_title');
+                if (title == '') {
+                    addclass('title');
                     iserror = true;
                 } else {
-                    removeclass('book_title');
+                    removeclass('title');
                 }
-                if (book_type == '') {
-                    addclass('book_type');
+                if (excel == '') {
+                    addclass('excel');
                     iserror = true;
                 } else {
-                    removeclass('book_type');
-                }
-                if (published_date == '') {
-                    addclass('published_date');
-                    iserror = true;
-                } else {
-                    removeclass('published_date');
-                }
-                if (author_name == '') {
-                    addclass('author_name');
-                    iserror = true;
-                } else {
-                    removeclass('author_name');
+                    removeclass('excel');
                 }
                 if (iserror) {
                     return false;
                 }else{
                      return true;
                 }
-                contentnamejson['book_title'] = book_title;
-                contentnamejson['book_type'] = book_type;
+                
+                contentnamejson['title'] = book_name_english;
+                contentnamejson['excel'] = book_name_hindi;
+                contentnamejson['book_name_urdu'] = book_name_urdu;
+                contentnamejson['category_id'] = category_id;
+                contentnamejson['sub_category_id'] = sub_category_id;
                 contentnamejson['published_date'] = published_date;
                 contentnamejson['author_name'] = author_name;
                 

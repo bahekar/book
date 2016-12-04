@@ -50,6 +50,7 @@
                         success: function (data)
                         {                        
                             code = data.response.code;
+                            //alert(code);
                             if (code == 0) {
                                 swal({title: "Success", text: "Category Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
                                     if (isConfirm) {

@@ -451,4 +451,144 @@ public class LoginController {
         }
         return strResponse.getErrorMessage();
     }
+    
+    @RequestMapping(value = "/addaudio", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView addaudio(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setBook_name_english(title);
+            
+            for (MultipartFile multipartfile : files) {
+                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+                    byte[] bytes = multipartfile.getBytes();
+                    File dir = new File(FILES_DIR);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    stream.close();
+//                    String newFilenmae = UUID.randomUUID() + ".jpg";
+//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+
+                    mainfilename = "/filepath/" + serverFile.getName();
+                    objContent.setFilePath(mainfilename);
+                }
+            }
+            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
+            response = objUserService.addaudio(objContent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("redirect:/list_audio");
+    }
+    
+    @RequestMapping(value = "/addvideo", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView addvideo(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setBook_name_english(title);
+            
+            for (MultipartFile multipartfile : files) {
+                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+                    byte[] bytes = multipartfile.getBytes();
+                    File dir = new File(FILES_DIR);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    stream.close();
+//                    String newFilenmae = UUID.randomUUID() + ".jpg";
+//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+
+                    mainfilename = "/filepath/" + serverFile.getName();
+                    objContent.setFilePath(mainfilename);
+                }
+            }
+            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
+            response = objUserService.addvideo(objContent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("redirect:/list_video");
+    }
+    
+    @RequestMapping(value = "/addmagazine", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView addmagazine(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setBook_name_english(title);
+            
+            for (MultipartFile multipartfile : files) {
+                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+                    byte[] bytes = multipartfile.getBytes();
+                    File dir = new File(FILES_DIR);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    stream.close();
+//                    String newFilenmae = UUID.randomUUID() + ".jpg";
+//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+
+                    mainfilename = "/filepath/" + serverFile.getName();
+                    objContent.setFilePath(mainfilename);
+                }
+            }
+            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
+            response = objUserService.addmagazine(objContent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("redirect:/list_magazine");
+    }
+    
+    @RequestMapping(value = "/addthoughts", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView addthoughts(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setBook_name_english(title);
+            
+            for (MultipartFile multipartfile : files) {
+                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+                    byte[] bytes = multipartfile.getBytes();
+                    File dir = new File(FILES_DIR);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    stream.close();
+//                    String newFilenmae = UUID.randomUUID() + ".jpg";
+//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+
+                    mainfilename = "/filepath/" + serverFile.getName();
+                    objContent.setFilePath(mainfilename);
+                }
+            }
+            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
+            response = objUserService.addthoughts(objContent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("redirect:/list_thoughts");
+    }
 }

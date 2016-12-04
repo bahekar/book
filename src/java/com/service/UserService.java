@@ -241,4 +241,84 @@ public class UserService {
     public JSONObject edit_book(String id) {
         return objUserDAO.edit_book(id);
     }
+    
+    public String addaudio(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.addcontent(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in add book(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    public String addvideo(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.addcontent(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in add book(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    public String addmagazine(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.addcontent(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in add book(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    public String addthoughts(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.addcontent(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in add book(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
 }

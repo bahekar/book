@@ -78,6 +78,10 @@
             <li><a href="sub_category">Sub-Category Listing</a></li>
             <li><a href="list_book">Book Listing</a></li>
             <li><a href="list_faq">FAQ Listing</a></li>
+            <li><a href="list_magazine">Magazine Listing</a></li>
+            <li><a href="list_thoughts">Thoughts Listing</a></li>
+            <li><a href="list_audio">Audio Listing</a></li>
+            <li><a href="list_video">Video Listing</a></li>
         </ul>
     </div>
   <script type="text/javascript">
