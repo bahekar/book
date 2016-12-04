@@ -472,6 +472,7 @@ public class CategoryController {
             strResult = objUserService.getContent(type);
 
 //            objRequest.put("contentlist", strResult);
+            System.out.println("svn test");
             return strResult.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);
