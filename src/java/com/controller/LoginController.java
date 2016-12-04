@@ -286,7 +286,6 @@ public class LoginController {
         session.setAttribute("restdet", strResponse.toString());
         model.setViewName("edit_book");
         return model;
-
     }
 
     @RequestMapping(value = "/edit_bulk_upload", method = RequestMethod.GET)
@@ -452,13 +451,14 @@ public class LoginController {
         return strResponse.getErrorMessage();
     }
     
-    @RequestMapping(value = "/addaudio", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView addaudio(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, HttpSession httpSession) {
+    @RequestMapping(value = "/addcontenttype", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView addcontenttype(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
         String response = "";
         String mainfilename = "";
         Content objContent = new Content();
         try {
-            objContent.setBook_name_english(title);
+            objContent.setTitle(title);
+            objContent.setType(type);
             
             for (MultipartFile multipartfile : files) {
                 if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
@@ -479,82 +479,18 @@ public class LoginController {
                 }
             }
             //  Content objContent = Utilities.fromJson(strJSON, Content.class);
-            response = objUserService.addaudio(objContent);
+            response = objUserService.addcontenttype(objContent);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ModelAndView("redirect:/list_audio");
-    }
-    
-    @RequestMapping(value = "/addvideo", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView addvideo(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, HttpSession httpSession) {
-        String response = "";
-        String mainfilename = "";
-        Content objContent = new Content();
-        try {
-            objContent.setBook_name_english(title);
-            
-            for (MultipartFile multipartfile : files) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setFilePath(mainfilename);
-                }
-            }
-            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
-            response = objUserService.addvideo(objContent);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(type == "2"){
+            return new ModelAndView("redirect:/list_magazine");
+        }else if(type == "3"){
+            return new ModelAndView("redirect:/list_audio");
+        }else{
+            return new ModelAndView("redirect:/list_video");
         }
-        return new ModelAndView("redirect:/list_video");
-    }
-    
-    @RequestMapping(value = "/addmagazine", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView addmagazine(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, HttpSession httpSession) {
-        String response = "";
-        String mainfilename = "";
-        Content objContent = new Content();
-        try {
-            objContent.setBook_name_english(title);
-            
-            for (MultipartFile multipartfile : files) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setFilePath(mainfilename);
-                }
-            }
-            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
-            response = objUserService.addmagazine(objContent);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ModelAndView("redirect:/list_magazine");
     }
     
     @RequestMapping(value = "/addthoughts", method = RequestMethod.POST, produces = {"application/json"})
@@ -590,5 +526,92 @@ public class LoginController {
             e.printStackTrace();
         }
         return new ModelAndView("redirect:/list_thoughts");
+    }
+    
+    @RequestMapping(value = "/content_type_list", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
+    public String content_type_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex, @RequestParam("type") String type) {
+        String strTid = UUID.randomUUID().toString();
+        String strResult = null;
+        try {
+            int fromIndex = 0;
+            if (page > 0) {
+                fromIndex = (page - 1) * endIndex;
+            }
+            JSONObject json = new JSONObject();
+            JSONArray obj = objUserService.content_type_list(strTid, fromIndex, endIndex, type);
+            json.put("total", objUserService.content_type_listCount(strTid));
+            json.put("page", page);
+            json.put("records", obj.length());
+            json.put("rows", obj);
+            return json.toString();
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid);
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    @RequestMapping(value = "/delete_content_type", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+    public String delete_content_type(@RequestParam(value = "id", required = false) String id, @RequestParam(value = "ctid", required = false) String ctid, HttpSession httpSession) {
+        String transId = UUID.randomUUID().toString();
+        String strResponse = objUserService.delete_content_type(id, ctid, transId);
+
+        return strResponse;
+    }
+    
+    @RequestMapping(value = "/edit_magazine", method = RequestMethod.GET)
+    public Object edit_magazine(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_magazine");
+        return model;
+    }
+    
+    @RequestMapping(value = "/editcontenttype", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView editcontenttype(@RequestParam(value = "title", required = false) String title,@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "cid", required = false) String cid, @RequestParam(value = "ctid", required = false) String ctid, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setTitle(title);
+            objContent.setCid(cid);
+            objContent.setCtid(ctid);
+            objContent.setType(type);
+            for (MultipartFile multipartfile : files) {
+                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+                    byte[] bytes = multipartfile.getBytes();
+                    File dir = new File(FILES_DIR);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    stream.close();
+//                    String newFilenmae = UUID.randomUUID() + ".jpg";
+//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+
+                    mainfilename = "/filepath/" + serverFile.getName();
+                    objContent.setFilePath(mainfilename);
+                }
+            }
+            //  Content objContent = Utilities.fromJson(strJSON, Content.class);
+           response = objUserService.editcontenttype(objContent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(type == "2"){
+            return new ModelAndView("redirect:/list_magazine");
+        }else if(type == "3"){
+            return new ModelAndView("redirect:/list_audio");
+        }else{
+            return new ModelAndView("redirect:/list_video");
+        }
     }
 }

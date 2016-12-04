@@ -241,55 +241,15 @@ public class UserService {
     public JSONObject edit_book(String id) {
         return objUserDAO.edit_book(id);
     }
-    
-    public String addaudio(Content objContent) {
+        
+    public String addcontenttype(Content objContent) {
         int isUpdated = 0;
         int nUserID = -1;
         ResponseCodes.ServiceErrorCodes errorCode = null;
         String strTid = UUID.randomUUID().toString();
         try {
 
-            isUpdated = objUserDAO.addcontent(objContent);
-            if (isUpdated > 0) {
-                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
-            } else {
-                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception in add book(),ex:" + e.getMessage(), e);
-            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
-        }
-    }
-    
-    public String addvideo(Content objContent) {
-        int isUpdated = 0;
-        int nUserID = -1;
-        ResponseCodes.ServiceErrorCodes errorCode = null;
-        String strTid = UUID.randomUUID().toString();
-        try {
-
-            isUpdated = objUserDAO.addcontent(objContent);
-            if (isUpdated > 0) {
-                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
-            } else {
-                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception in add book(),ex:" + e.getMessage(), e);
-            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
-        }
-    }
-    
-    public String addmagazine(Content objContent) {
-        int isUpdated = 0;
-        int nUserID = -1;
-        ResponseCodes.ServiceErrorCodes errorCode = null;
-        String strTid = UUID.randomUUID().toString();
-        try {
-
-            isUpdated = objUserDAO.addcontent(objContent);
+            isUpdated = objUserDAO.addcontenttype(objContent);
             if (isUpdated > 0) {
                 return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
             } else {
@@ -318,6 +278,57 @@ public class UserService {
 
         } catch (Exception e) {
             logger.error("Exception in add book(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    public int content_type_listCount(String transId) throws SQLException, Exception {
+        return objUserDAO.content_type_listCount(transId);
+    }
+
+    public JSONArray content_type_list(String transId, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+        return objUserDAO.content_type_list(transId, fromIndex, endIndex, type);
+    }
+    
+    public String delete_content_type(String id, String ctid, String strTid) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        try {
+
+            isUpdated = objUserDAO.delete_content_type(id, ctid);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponsetoken(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in delete_single_upload(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
+    public JSONObject edit_magazine(String id, String ctid) {
+        return objUserDAO.edit_magazine(id, ctid);
+    }
+    
+    public String editcontenttype(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.editcontenttype(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in editcontenttype(),ex:" + e.getMessage(), e);
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }

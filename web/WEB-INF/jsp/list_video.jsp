@@ -28,7 +28,7 @@
 
     function childserviceload() {
         $('#tt').datagrid({
-            url: 'get_single_upload_list',
+            url: 'content_type_list?type=4',
             onLoadSuccess: checkchildserviceload
         });
     }
@@ -36,12 +36,8 @@
         length = $('#tt').datagrid('getRows').length;
         htmocontent = '<div class="well"><table class="table"><thead><tr>';
         htmocontent = htmocontent + '<th>#</th>';
-        htmocontent = htmocontent + '<th>Book Name English</th>';
-        htmocontent = htmocontent + '<th>Book Name Hindi</th>';
-        htmocontent = htmocontent + '<th>Book Name Urdu</th>';
-        htmocontent = htmocontent + '<th>Author Name</th>';
-        htmocontent = htmocontent + '<th>Published Date</th>';
-        htmocontent = htmocontent + '<th>Uploaded File</th>';
+        htmocontent = htmocontent + '<th>Title</th>';
+        htmocontent = htmocontent + '<th>Image</th>';
         htmocontent = htmocontent + '<th>Edit</th>';
         htmocontent = htmocontent + '<th>Delete</th>';
         htmocontent = htmocontent + '</tr></thead><tbody>';
@@ -49,12 +45,8 @@
             var selectedRow = $('#tt').datagrid('getRows')[i];
             htmocontent = htmocontent + '<tr>';
             htmocontent = htmocontent + '<td>' + selectedRow.id + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.book_name_english + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.book_name_hindi + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.book_name_urdu + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.author_name + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.published_date + '</td>';
-            htmocontent = htmocontent + '<td><a href="' + selectedRow.file_path + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
+            htmocontent = htmocontent + '<td>' + selectedRow.title + '</td>';
+            htmocontent = htmocontent + '<td><a href="' + selectedRow.image + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
             htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ')" >Edit</a></td>';
             htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +')">Delete</a></td>';
             htmocontent = htmocontent + '</tr>';

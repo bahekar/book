@@ -882,4 +882,237 @@ public class UserDAO {
         }
         return neighborhoodObj;
     }
+    
+    public int addcontenttype(Content objContent) {
+        String insertQuery = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type`(`title`,`type`) VALUES (?,?)");
+        String insertQuery2 = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type_image`(`image`,`content_id`) VALUES (?,?)");
+        
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+
+                pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+
+                pstmt.setString(1, objContent.getTitle());
+                pstmt.setString(2, objContent.getType());
+               
+                int nRes = pstmt.executeUpdate();
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    nRes = rs.getInt(1);
+                }
+                pstmt = objConn.prepareStatement(insertQuery2, Statement.RETURN_GENERATED_KEYS);
+
+                pstmt.setString(1, objContent.getFilePath());
+                pstmt.setInt(2, nRes);
+                nRes = pstmt.executeUpdate();
+                return nRes;
+            }
+        } catch (SQLException sqle) {
+            logger.error("add content type() : Got SQLException " + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+            logger.error("add content type() : Got SQLException " + Utilities.getStackTrace(e));
+
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
+    
+    public JSONArray content_type_list(String strTid, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("query", "SELECT ct.id as id, cti.id as ctid, ct.title as title, cti.image as image FROM content_type as ct, content_type_image as cti where ct.id = cti.content_id and ct.type = "+type+" order by ct.title asc LIMIT " + fromIndex + "," + endIndex + "");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(query);
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                    property.put("image", url + Utilities.nullToEmpty(rs.getString("image")));
+                    property.put("ctid", Utilities.nullToEmpty(rs.getString("ctid")));
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while content_type_list" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while content_type_list" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+
+    public int content_type_listCount(String strTid) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM content_type");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        int count = 0;
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(query);
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    count = rs.getInt("count");
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while content_type_listCount" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while content_type_listCount" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return count;
+    }
+    
+    public int delete_content_type(String id, String ctid) throws SQLException, Exception {
+        
+        String delete_content_type = ConfigUtil.getProperty("delete_content_type", "DELETE FROM `content_type` WHERE id=?");
+        String delete_content_type2 = ConfigUtil.getProperty("delete_content_type", "DELETE FROM `content_type_image` WHERE id=?");
+        
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+
+        Connection objConn = null;
+        int status = 0;
+        try {
+            objConn = dbconnection.getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(delete_content_type);
+                pstmt.setString(1, id);
+                status = pstmt.executeUpdate();
+                
+                pstmt = objConn.prepareStatement(delete_content_type2);
+                pstmt.setString(1, ctid);
+                status = pstmt.executeUpdate();
+
+                logger.debug("no of res deletetd is :" + status);
+
+            } else {
+                logger.error("delete_content_type(): connection object is null");
+            }
+        } catch (SQLException sqle) {
+            logger.error("delete_content_type() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("delete_content_type() Got Exception : " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return status;
+    }
+    
+    public JSONObject edit_magazine(String id, String ctid) {
+        JSONObject neighborhoodObj = new JSONObject();
+        String single_details = ConfigUtil.getProperty("details", "SELECT ct.id as id, cti.id as ctid, ct.title as title, cti.image as image FROM content_type as ct, content_type_image as cti where ct.id = " + id + " AND cti.id = " + ctid);
+        ResultSet rs = null;
+        ResultSet rs1 = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement pstmt1 = null;
+        Connection objConn = null;
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(single_details);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    neighborhoodObj.put("id", Utilities.nullToEmpty(rs.getString("id")));
+                    neighborhoodObj.put("ctid", Utilities.nullToEmpty(rs.getString("ctid")));
+                    neighborhoodObj.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                    neighborhoodObj.put("image", url + Utilities.nullToEmpty(rs.getString("image")));
+                }
+            }
+        } catch (Exception e) {
+            logger.error(" Got book" + Utilities.getStackTrace(e));
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+                dbconnection.closeConnection(rs1, pstmt1, objConn);
+            }
+        }
+        return neighborhoodObj;
+    }
+    
+    public int editcontenttype(Content objContent) {
+        String updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type` SET `title`=? where id=? ");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement pstmt1 = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+
+                if (StringUtils.isBlank(objContent.getFilePath())) {
+                    pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+                } else {
+                    updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type` SET `title`=? where id=? ");
+                    pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+                   
+                }
+                pstmt.setString(1, objContent.getTitle());
+                pstmt.setString(2, objContent.getCid());
+              
+                int nRes = pstmt.executeUpdate();
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    nRes = rs.getInt(1);
+                }
+                if (StringUtils.isNotBlank(objContent.getFilePath())) {
+                    pstmt1.setString(1, objContent.getFilePath());
+                    pstmt1.setString(2, objContent.getCtid());
+
+                    String updateQuery2 = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type_image` SET `image`=? where id=? ");
+                    pstmt1 = objConn.prepareStatement(updateQuery2, Statement.RETURN_GENERATED_KEYS);
+                    nRes = pstmt1.executeUpdate();
+                }
+                
+                return nRes;
+            }
+        } catch (SQLException sqle) {
+            logger.error("edit editcontenttype() : Got SQLException " + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+            logger.error("edit editcontenttype() : Got SQLException " + Utilities.getStackTrace(e));
+
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
 }

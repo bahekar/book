@@ -27,6 +27,10 @@ public class Content {
     private String published_date;
     private String author_name;
     private String filePath;
+    private String title;
+    private String type;
+    private String cid;
+    private String ctid;
     /**
      * @return the contentname
      */
@@ -263,5 +267,61 @@ public class Content {
      */
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * @return the cid
+     */
+    public String getCid() {
+        return cid;
+    }
+
+    /**
+     * @param cid the cid to set
+     */
+    public void setCid(String cid) {
+        this.cid = cid;
+    }
+
+    /**
+     * @return the ctid
+     */
+    public String getCtid() {
+        return ctid;
+    }
+
+    /**
+     * @param ctid the ctid to set
+     */
+    public void setCtid(String ctid) {
+        this.ctid = ctid;
     }
 }

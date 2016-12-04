@@ -11,10 +11,10 @@
         </ul>
         <div class="container-fluid">
             <div class="row-fluid">
-				<br><br><br>
-                                        <form:form method="post" onsubmit="return Categorysave();" action="addcontent"  enctype="multipart/form-data">
-
-				<div class="well">
+                <br><br><br>
+                <form:form method="post" onsubmit="return Categorysave();" action="addcontenttype" enctype="multipart/form-data">
+                    <input type="hidden" id="type" name="type" value="4">
+                    <div class="well">
 										
 					<div class="row-fluid">
 						<div class="span6">
@@ -62,45 +62,6 @@
                 }else{
                      return true;
                 }
-                
-                contentnamejson['title'] = book_name_english;
-                contentnamejson['excel'] = book_name_hindi;
-                contentnamejson['book_name_urdu'] = book_name_urdu;
-                contentnamejson['category_id'] = category_id;
-                contentnamejson['sub_category_id'] = sub_category_id;
-                contentnamejson['published_date'] = published_date;
-                contentnamejson['author_name'] = author_name;
-                
-                       var content_value = JSON.stringify(contentnamejson);
-                        $.ajax({
-                            url: "addcontent",
-                            type: "POST",
-                            dataType: "json",
-                            data:content_value,
-                            async: false,
-                            contentType: "application/json",
-                            success: function (data)
-                            {
-                                code = data.response.code;
-                                //alert(code);
-                                if (code == 0) {
-                                    swal({title: "Success", text: "Book added Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
-                                        if (isConfirm) {
-                                            //alert(isConfirm);
-                                            window.location = 'list_book';
-                                        }
-                                    });
-                                } else if (code == 108) {
-                                    sweetAlert('Oops...', 'Invalid UserId!', 'error');
-
-                                } else if (code == 109) {
-                                    sweetAlert('Oops...', 'Invalid Password!', 'error');
-
-                                } else {
-                                    sweetAlert('Oops...', 'Something went wrong!', 'error');
-                                }
-                            }
-                        });
-                        }
+            }
                     
 </script>
