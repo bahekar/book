@@ -784,7 +784,7 @@ public class CategoryDAO {
         return -1;
     }
 
-    public JSONArray getbooks(String language) {
+    public JSONObject getbooks(String language) {
         String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM book");
 
         if (StringUtils.isNotBlank(language)) {
@@ -794,7 +794,7 @@ public class CategoryDAO {
         PreparedStatement pstmt = null;
         Connection objConn = null;
 
-        JSONArray thoughts = new JSONArray();
+        JSONObject thoughts = new JSONObject();
         JSONArray propertyArrayhindi = new JSONArray();
         JSONArray propertyArrayenglish = new JSONArray();
         JSONArray propertyArrayUrdu = new JSONArray();
@@ -813,6 +813,7 @@ public class CategoryDAO {
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                          property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                         int booktype = rs.getInt("book_type");
                         if (booktype == 1) {
@@ -824,13 +825,14 @@ public class CategoryDAO {
                         } else {
                             propertyArrayarra.put(property);
                         }
-
+                        property.put("book_type", Utilities.nullToEmpty(rs.getString("book_type")));
                     } else if (language.equalsIgnoreCase("1")) {
                         property.put(Constants.id, rs.getString(Constants.id));
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                        property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         propertyArrayenglish.put(property);
                     } else if (language.equalsIgnoreCase("3")) {
                         property.put(Constants.id, rs.getString(Constants.id));
@@ -838,12 +840,14 @@ public class CategoryDAO {
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                        property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         propertyArrayUrdu.put(property);
                     } else if (language.equalsIgnoreCase("2")) {
                         property.put(Constants.id, rs.getString(Constants.id));
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         propertyArrayhindi.put(property);
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     } else {
@@ -851,29 +855,30 @@ public class CategoryDAO {
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         propertyArrayarra.put(property);
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     }
                 }
                 if (propertyArrayenglish.length() > 0) {
-                    JSONObject english = new JSONObject();
-                    english.put("english", propertyArrayenglish);
-                    thoughts.put(english);
+                   // JSONObject english = new JSONObject();
+                    thoughts.put("english", propertyArrayenglish);
+                   // thoughts.put(english);
                 }
                 if (propertyArrayhindi.length() > 0) {
-                    JSONObject hindi = new JSONObject();
-                    hindi.put("hindi", propertyArrayhindi);
-                    thoughts.put(hindi);
+                   // JSONObject hindi = new JSONObject();
+                    thoughts.put("hindi", propertyArrayhindi);
+                  //  thoughts.put(hindi);
                 }
                 if (propertyArrayUrdu.length() > 0) {
-                    JSONObject urdu = new JSONObject();
-                    urdu.put("urdu", propertyArrayUrdu);
-                    thoughts.put(urdu);
+                   // JSONObject urdu = new JSONObject();
+                    thoughts.put("urdu", propertyArrayUrdu);
+                   // thoughts.put(urdu);
                 }
                 if (propertyArrayarra.length() > 0) {
-                    JSONObject urdu = new JSONObject();
-                    urdu.put("arabic", propertyArrayUrdu);
-                    thoughts.put(urdu);
+                   // JSONObject urdu = new JSONObject();
+                    thoughts.put("arabic", propertyArrayUrdu);
+                   // thoughts.put(urdu);
                 }
             }
         } catch (SQLException sqle) {
@@ -931,7 +936,6 @@ public class CategoryDAO {
         return propertyArray;
     }
 
-   
     public JSONArray getphotos() {
         String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM photos");
 
@@ -970,7 +974,7 @@ public class CategoryDAO {
         return propertyArray;
     }
 
-   public JSONArray getContent(String type) {
+    public JSONArray getContent(String type) {
         String selectcat = ConfigUtil.getProperty("select.thoughts.query1", "SELECT * FROM content_type where type=" + type);
 
         ResultSet rs = null;
@@ -1022,5 +1026,4 @@ public class CategoryDAO {
         return propertyArray;
     }
 
-	
 }

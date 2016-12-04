@@ -393,17 +393,17 @@ public class CategoryController {
     @RequestMapping(value = "/api/getbooks", method = RequestMethod.GET)
     public @ResponseBody
     byte[] getbooks(@RequestParam(value = "language", required = false) String language, HttpSession httpSession) throws UnsupportedEncodingException {
-        JSONArray strResult = null;
+        JSONObject strResult = null;
         String transId = UUID.randomUUID().toString();
 
         try {
-            JSONObject objRequest = new JSONObject();
-            objRequest.put("code", "0");
-            objRequest.put("description", "success");
+//            JSONObject objRequest = new JSONObject();
+//            objRequest.put("code", "0");
+//            objRequest.put("description", "success");
             strResult = objUserService.getbooks(language);
-
-            objRequest.put("bookslist", strResult);
-            return objRequest.toString().getBytes("UTF-8");
+//
+//            objRequest.put("bookslist", strResult);
+            return strResult.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);
             return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");

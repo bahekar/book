@@ -187,7 +187,7 @@ public class CategoryService {
         return objUserDAO.getsubcategory(id);
     }
 
-    public JSONArray getbooks(String language) {
+    public JSONObject getbooks(String language) {
         return objUserDAO.getbooks(language);
     }
 
