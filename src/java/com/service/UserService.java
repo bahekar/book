@@ -269,7 +269,7 @@ public class UserService {
         String strTid = UUID.randomUUID().toString();
         try {
 
-            isUpdated = objUserDAO.addcontent(objContent);
+            isUpdated = objUserDAO.addthoughts(objContent);
             if (isUpdated > 0) {
                 return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
             } else {

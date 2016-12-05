@@ -516,12 +516,13 @@ public class LoginController {
     }
     
     @RequestMapping(value = "/addthoughts", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView addthoughts(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, HttpSession httpSession) {
+    public ModelAndView addthoughts(@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "title", required = false) String title, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
         String response = "";
         String mainfilename = "";
         Content objContent = new Content();
         try {
-            objContent.setBook_name_english(title);
+            objContent.setTitle(title);
+            objContent.setType(type);
             
 //            for (MultipartFile multipartfile : files) {
 //                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
@@ -592,6 +593,50 @@ public class LoginController {
         HttpSession session = request.getSession();
         session.setAttribute("restdet", strResponse.toString());
         model.setViewName("edit_magazine");
+        return model;
+    }
+    
+    @RequestMapping(value = "/edit_ferozan", method = RequestMethod.GET)
+    public Object edit_ferozan(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_ferozan");
+        return model;
+    }
+    
+    @RequestMapping(value = "/edit_audio", method = RequestMethod.GET)
+    public Object edit_audio(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_audio");
+        return model;
+    }
+    
+    @RequestMapping(value = "/edit_video", method = RequestMethod.GET)
+    public Object edit_video(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_video");
+        return model;
+    }
+    
+    @RequestMapping(value = "/edit_thoughts", method = RequestMethod.GET)
+    public Object edit_thoughts(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_video");
         return model;
     }
     

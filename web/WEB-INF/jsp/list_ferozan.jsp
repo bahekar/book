@@ -1,16 +1,16 @@
 <%@include file="header.jsp" %>   
 <div class="content">
     <div class="header">
-        <h1 class="page-title">List Audio</h1>
+        <h1 class="page-title">List Sham-e-Ferozan</h1>
     </div>
     <ul class="breadcrumb">
         <li><a href="home">Dashboard</a> <span class="divider">/</span></li>
-        <li class="active">List Audio</li>
+        <li class="active">List Sham-e-Ferozan</li>
     </ul>
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="btn-toolbar">
-                <a href="add_audio" class="btn btn-primary btn-sign-in"><i class="icon-plus"></i> Add Audio</a>
+                <a href="add_ferozan" class="btn btn-primary btn-sign-in"><i class="icon-plus"></i> Add Sham-e-Ferozan</a>
             </div>
             <div id="ctl00_cph_divWorkAreaContent" style="overflow: hidden;" ></div>
             <div id="tt" style="width:auto;height:0!important"
@@ -28,7 +28,7 @@
 
     function childserviceload() {
         $('#tt').datagrid({
-            url: 'content_type_list?type=3',
+            url: 'content_type_list?type=5',
             onLoadSuccess: checkchildserviceload
         });
     }
@@ -47,7 +47,7 @@
             htmocontent = htmocontent + '<td>' + selectedRow.id + '</td>';
             htmocontent = htmocontent + '<td>' + selectedRow.title + '</td>';
             htmocontent = htmocontent + '<td><a href="' + selectedRow.image + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
-             htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ', ' + selectedRow.ctid + ')" >Edit</a></td>';
+            htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ', ' + selectedRow.ctid + ')" >Edit</a></td>';
             htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +', ' + selectedRow.ctid + ')">Delete</a></td>';
             htmocontent = htmocontent + '</tr>';
         }
@@ -55,10 +55,10 @@
         $("#ctl00_cph_divWorkAreaContent").html(htmocontent);
     }
     function editcontent(id, ctid){
-        window.location="edit_audio?id="+id+"&ctid="+ctid;
+        window.location="edit_ferozan?id="+id+"&ctid="+ctid;
     }
     function deletecontent(id, ctid) {
-        swal({title: "Are you sure?", text: "You want to delete this audio!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
+        swal({title: "Are you sure?", text: "You want to delete this Sham-e-Ferozan!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
             $.ajax({
                 url: "delete_content_type?id=" + id + "&ctid=" + ctid,
                 type: "GET",
@@ -68,9 +68,9 @@
                 {
                     code = data.response.code;
                     if (code == 0) {
-                        swal({title: "Success", text: "Audio Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
+                        swal({title: "Success", text: "Sham-e-Ferozan Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
                             if (isConfirm) {
-                                window.location = 'list_audio';
+                                window.location = 'list_ferozan';
                             }
                         });
                     } else {

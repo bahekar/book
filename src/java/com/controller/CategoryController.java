@@ -545,6 +545,20 @@ public class CategoryController {
         model.setViewName("add_video");
         return model;
     }
+    
+    @RequestMapping(value = "/list_ferozan", method = RequestMethod.GET)
+    public Object list_ferozan(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("list_ferozan");
+        return model;
+    }
+
+    @RequestMapping(value = "/add_ferozan", method = RequestMethod.GET)
+    public Object add_ferozan(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("add_ferozan");
+        return model;
+    }
 
     @RequestMapping(value = "/api/addfaq", method = RequestMethod.POST, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
     public String addfaq(@RequestBody String strJSON, HttpSession httpSession) {

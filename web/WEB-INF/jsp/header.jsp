@@ -82,6 +82,7 @@
             <li><a href="list_thoughts">Thoughts Listing</a></li>
             <li><a href="list_audio">Audio Listing</a></li>
             <li><a href="list_video">Video Listing</a></li>
+            <li><a href="list_ferozan">Sham-E-Ferozan</a></li>
         </ul>
     </div>
   <script type="text/javascript">

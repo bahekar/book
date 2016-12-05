@@ -47,20 +47,20 @@
             htmocontent = htmocontent + '<td>' + selectedRow.id + '</td>';
             htmocontent = htmocontent + '<td>' + selectedRow.title + '</td>';
             htmocontent = htmocontent + '<td><a href="' + selectedRow.image + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
-            htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ')" >Edit</a></td>';
-            htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +')">Delete</a></td>';
+             htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ', ' + selectedRow.ctid + ')" >Edit</a></td>';
+            htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +', ' + selectedRow.ctid + ')">Delete</a></td>';
             htmocontent = htmocontent + '</tr>';
         }
         htmocontent = htmocontent + '</tbody></table></div>';
         $("#ctl00_cph_divWorkAreaContent").html(htmocontent);
     }
-    function editcontent(id){
-        window.location="edit_book?id="+id;
+    function editcontent(id, ctid){
+        window.location="edit_video?id="+id+"&ctid="+ctid;
     }
-    function deletecontent(id) {
-        swal({title: "Are you sure?", text: "You want to delete this book!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
+    function deletecontent(id, ctid) {
+        swal({title: "Are you sure?", text: "You want to delete this video!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
             $.ajax({
-                url: "delete_single_upload?id=" + id,
+                url: "delete_content_type?id=" + id + "&ctid=" + ctid,
                 type: "GET",
                 dataType: "json",
                 contentType: "application/json",
@@ -68,9 +68,9 @@
                 {
                     code = data.response.code;
                     if (code == 0) {
-                        swal({title: "Success", text: "Book Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
+                        swal({title: "Success", text: "Video Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
                             if (isConfirm) {
-                                window.location = 'list_book';
+                                window.location = 'list_video';
                             }
                         });
                     } else {

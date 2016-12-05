@@ -1118,4 +1118,46 @@ public class UserDAO {
         }
         return -1;
     }
+    
+    public int addthoughts(Content objContent) {
+        String insertQuery = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type`(`title`,`type`) VALUES (?,?)");
+        String insertQuery2 = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type_image`(`image`,`content_id`) VALUES (?,?)");
+        
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+
+                pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+
+                pstmt.setString(1, objContent.getTitle());
+                pstmt.setString(2, objContent.getType());
+               
+                int nRes = pstmt.executeUpdate();
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    nRes = rs.getInt(1);
+                }
+                pstmt = objConn.prepareStatement(insertQuery2, Statement.RETURN_GENERATED_KEYS);
+
+                pstmt.setString(1, objContent.getFilePath());
+                pstmt.setInt(2, nRes);
+                nRes = pstmt.executeUpdate();
+                return nRes;
+            }
+        } catch (SQLException sqle) {
+            logger.error("add content type() : Got SQLException " + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+            logger.error("add content type() : Got SQLException " + Utilities.getStackTrace(e));
+
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
 }

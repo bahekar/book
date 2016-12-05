@@ -3,18 +3,18 @@
     
     <div class="content">
         <div class="header">
-            <h1 class="page-title">Add Thoughts</h1>
+            <h1 class="page-title">Add Magazine</h1>
         </div>
         <ul class="breadcrumb">
             <li><a href="home">Home</a> <span class="divider">/</span></li>
-            <li>Add Thoughts</li>
+            <li>Add Magazine</li>
         </ul>
         <div class="container-fluid">
             <div class="row-fluid">
-				<br><br><br>
-                                        <form:form method="post" onsubmit="return Categorysave();" action="addthoughts"  enctype="multipart/form-data">
-                            <input type="hidden" id="type" name="type" value="1">
-				<div class="well">
+                <br><br><br>
+                <form:form method="post" onsubmit="return Categorysave();" action="addcontenttype" enctype="multipart/form-data">
+                    <input type="hidden" id="type" name="type" value="5">
+                    <div class="well">
 										
 					<div class="row-fluid">
 						<div class="span6">
@@ -62,7 +62,6 @@
                 }else{
                      return true;
                 }
-
-                        }
+            }
                     
 </script>

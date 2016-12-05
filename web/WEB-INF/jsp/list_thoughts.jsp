@@ -28,7 +28,7 @@
 
     function childserviceload() {
         $('#tt').datagrid({
-            url: 'get_single_upload_list',
+            url: 'content_type_list?type=1',
             onLoadSuccess: checkchildserviceload
         });
     }
@@ -36,12 +36,8 @@
         length = $('#tt').datagrid('getRows').length;
         htmocontent = '<div class="well"><table class="table"><thead><tr>';
         htmocontent = htmocontent + '<th>#</th>';
-        htmocontent = htmocontent + '<th>Book Name English</th>';
-        htmocontent = htmocontent + '<th>Book Name Hindi</th>';
-        htmocontent = htmocontent + '<th>Book Name Urdu</th>';
-        htmocontent = htmocontent + '<th>Author Name</th>';
-        htmocontent = htmocontent + '<th>Published Date</th>';
-        htmocontent = htmocontent + '<th>Uploaded File</th>';
+        htmocontent = htmocontent + '<th>Title</th>';
+        htmocontent = htmocontent + '<th>Image</th>';
         htmocontent = htmocontent + '<th>Edit</th>';
         htmocontent = htmocontent + '<th>Delete</th>';
         htmocontent = htmocontent + '</tr></thead><tbody>';
@@ -49,26 +45,22 @@
             var selectedRow = $('#tt').datagrid('getRows')[i];
             htmocontent = htmocontent + '<tr>';
             htmocontent = htmocontent + '<td>' + selectedRow.id + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.book_name_english + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.book_name_hindi + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.book_name_urdu + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.author_name + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.published_date + '</td>';
-            htmocontent = htmocontent + '<td><a href="' + selectedRow.file_path + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
-            htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ')" >Edit</a></td>';
-            htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +')">Delete</a></td>';
+            htmocontent = htmocontent + '<td>' + selectedRow.title + '</td>';
+            htmocontent = htmocontent + '<td><a href="' + selectedRow.image + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
+             htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ', ' + selectedRow.ctid + ')" >Edit</a></td>';
+            htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +', ' + selectedRow.ctid + ')">Delete</a></td>';
             htmocontent = htmocontent + '</tr>';
         }
         htmocontent = htmocontent + '</tbody></table></div>';
         $("#ctl00_cph_divWorkAreaContent").html(htmocontent);
     }
-    function editcontent(id){
-        window.location="edit_book?id="+id;
+    function editcontent(id, ctid){
+        window.location="edit_thoughts?id="+id+"&ctid="+ctid;
     }
-    function deletecontent(id) {
-        swal({title: "Are you sure?", text: "You want to delete this book!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
+    function deletecontent(id, ctid) {
+        swal({title: "Are you sure?", text: "You want to delete this thoughts!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
             $.ajax({
-                url: "delete_single_upload?id=" + id,
+                url: "delete_content_type?id=" + id + "&ctid=" + ctid,
                 type: "GET",
                 dataType: "json",
                 contentType: "application/json",
@@ -76,9 +68,9 @@
                 {
                     code = data.response.code;
                     if (code == 0) {
-                        swal({title: "Success", text: "Book Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
+                        swal({title: "Success", text: "Thoughts Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
                             if (isConfirm) {
-                                window.location = 'list_book';
+                                window.location = 'list_thoughts';
                             }
                         });
                     } else {
