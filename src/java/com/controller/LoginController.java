@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -117,40 +118,42 @@ public class LoginController {
             objContent.setAuthor_name(author_name);
             objContent.setBook_type(book_type);
             
-            for (MultipartFile multipartfile : files) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setFilePath(mainfilename);
-                }
-            }
-            for (MultipartFile multipartfile : content_file) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setContent_file(mainfilename);
-                }
-            }
+//            for (MultipartFile multipartfile : files) {
+//                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+//                    byte[] bytes = multipartfile.getBytes();
+//                    File dir = new File(FILES_DIR);
+//                    if (!dir.exists()) {
+//                        dir.mkdirs();
+//                    }
+//                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+//                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//                    stream.write(bytes);
+//                    stream.close();
+////                    String newFilenmae = UUID.randomUUID() + ".jpg";
+////                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+//                    mainfilename = "/filepath/" + serverFile.getName();
+//                    objContent.setFilePath(mainfilename);
+//                }
+//            }
+            objContent.setFilePath(Writefile(files));
+//            for (MultipartFile multipartfile : content_file) {
+//                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+//                    byte[] bytes = multipartfile.getBytes();
+//                    File dir = new File(FILES_DIR);
+//                    if (!dir.exists()) {
+//                        dir.mkdirs();
+//                    }
+//                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+//                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//                    stream.write(bytes);
+//                    stream.close();
+////                    String newFilenmae = UUID.randomUUID() + ".jpg";
+////                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+//                    mainfilename = "/filepath/" + serverFile.getName();
+//                    objContent.setContent_file(mainfilename);
+//                }
+//            }
+             objContent.setContent_file(Writefile(content_file));
             //  Content objContent = Utilities.fromJson(strJSON, Content.class);
             response = objUserService.addcontent(objContent);
             
@@ -171,41 +174,43 @@ public class LoginController {
             objContent.setAuthor_name(author_name);
             objContent.setBook_type(book_type);
             objContent.setId(id);
-            for (MultipartFile multipartfile : files) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setFilePath(mainfilename);
-                }
-            }
-            for (MultipartFile multipartfile : content_file) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setContent_file(mainfilename);
-                }
-            }
+//            for (MultipartFile multipartfile : files) {
+//                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+//                    byte[] bytes = multipartfile.getBytes();
+//                    File dir = new File(FILES_DIR);
+//                    if (!dir.exists()) {
+//                        dir.mkdirs();
+//                    }
+//                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+//                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//                    stream.write(bytes);
+//                    stream.close();
+////                    String newFilenmae = UUID.randomUUID() + ".jpg";
+////                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+//
+//                    mainfilename = "/filepath/" + serverFile.getName();
+//                    objContent.setFilePath(mainfilename);
+//                }
+//            }
+              objContent.setFilePath(Writefile(files));
+            objContent.setContent_file(Writefile(content_file));
+//            for (MultipartFile multipartfile : content_file) {
+//                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+//                    byte[] bytes = multipartfile.getBytes();
+//                    File dir = new File(FILES_DIR);
+//                    if (!dir.exists()) {
+//                        dir.mkdirs();
+//                    }
+//                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+//                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//                    stream.write(bytes);
+//                    stream.close();
+////                    String newFilenmae = UUID.randomUUID() + ".jpg";
+////                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+//                    mainfilename = "/filepath/" + serverFile.getName();
+//                    objContent.setContent_file(mainfilename);
+//                }
+//            }
             //  Content objContent = Utilities.fromJson(strJSON, Content.class);
            response = objUserService.edit_content(objContent);
 
@@ -448,6 +453,7 @@ public class LoginController {
                     Filename = multipartfile.getInputStream();
                 }
             }
+            
             strResponse = objUserService.rss_feed_insert(Filename, sub_category_id, description, transId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -475,24 +481,25 @@ public class LoginController {
             objContent.setTitle(title);
             objContent.setType(type);
             
-            for (MultipartFile multipartfile : files) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setFilePath(mainfilename);
-                }
-            }
+//            for (MultipartFile multipartfile : files) {
+//                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+//                    byte[] bytes = multipartfile.getBytes();
+//                    File dir = new File(FILES_DIR);
+//                    if (!dir.exists()) {
+//                        dir.mkdirs();
+//                    }
+//                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+//                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//                    stream.write(bytes);
+//                    stream.close();
+////                    String newFilenmae = UUID.randomUUID() + ".jpg";
+////                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+//
+//                    mainfilename = "/filepath/" + serverFile.getName();
+//                    objContent.setFilePath(mainfilename);
+//                }
+//            }
+             objContent.setFilePath(Writefile(files));
             //  Content objContent = Utilities.fromJson(strJSON, Content.class);
             response = objUserService.addcontenttype(objContent);
 
@@ -516,24 +523,25 @@ public class LoginController {
         try {
             objContent.setBook_name_english(title);
             
-            for (MultipartFile multipartfile : files) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setFilePath(mainfilename);
-                }
-            }
+//            for (MultipartFile multipartfile : files) {
+//                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+//                    byte[] bytes = multipartfile.getBytes();
+//                    File dir = new File(FILES_DIR);
+//                    if (!dir.exists()) {
+//                        dir.mkdirs();
+//                    }
+//                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+//                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//                    stream.write(bytes);
+//                    stream.close();
+////                    String newFilenmae = UUID.randomUUID() + ".jpg";
+////                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+//
+//                    mainfilename = "/filepath/" + serverFile.getName();
+//                    objContent.setFilePath(mainfilename);
+//                }
+//            }
+             objContent.setFilePath(Writefile(files));
             //  Content objContent = Utilities.fromJson(strJSON, Content.class);
             response = objUserService.addthoughts(objContent);
 
@@ -597,24 +605,25 @@ public class LoginController {
             objContent.setCid(cid);
             objContent.setCtid(ctid);
             objContent.setType(type);
-            for (MultipartFile multipartfile : files) {
-                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
-                    byte[] bytes = multipartfile.getBytes();
-                    File dir = new File(FILES_DIR);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
-                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                    stream.write(bytes);
-                    stream.close();
-//                    String newFilenmae = UUID.randomUUID() + ".jpg";
-//                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
-
-                    mainfilename = "/filepath/" + serverFile.getName();
-                    objContent.setFilePath(mainfilename);
-                }
-            }
+//            for (MultipartFile multipartfile : files) {
+//                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+//                    byte[] bytes = multipartfile.getBytes();
+//                    File dir = new File(FILES_DIR);
+//                    if (!dir.exists()) {
+//                        dir.mkdirs();
+//                    }
+//                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+//                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//                    stream.write(bytes);
+//                    stream.close();
+////                    String newFilenmae = UUID.randomUUID() + ".jpg";
+////                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+//
+//                    mainfilename = "/filepath/" + serverFile.getName();
+//                    objContent.setFilePath(mainfilename);
+//                }
+//            }
+             objContent.setFilePath(Writefile(files));
             //  Content objContent = Utilities.fromJson(strJSON, Content.class);
            response = objUserService.editcontenttype(objContent);
 
@@ -628,5 +637,32 @@ public class LoginController {
         }else{
             return new ModelAndView("redirect:/list_video");
         }
+    }
+    
+    public String Writefile(MultipartFile[] content_file) {
+        String mainfilename = null;
+        try {
+            for (MultipartFile multipartfile : content_file) {
+                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
+                    byte[] bytes = multipartfile.getBytes();
+                    File dir = new File(FILES_DIR);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    File serverFile = new File(dir.getAbsolutePath() + File.separator + multipartfile.getOriginalFilename());
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    stream.close();
+                    String ext1 = FilenameUtils.getExtension(serverFile.getName());
+                    String newFilenmae = UUID.randomUUID() + "."+ext1;
+                    serverFile.renameTo(new File(dir.getAbsolutePath() + File.separator + newFilenmae));
+                    mainfilename = "/filepath/" + newFilenmae;
+                    // objContent.setContent_file(mainfilename);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mainfilename;
     }
 }
