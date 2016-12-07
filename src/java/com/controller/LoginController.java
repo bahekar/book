@@ -88,11 +88,19 @@ public class LoginController {
     public Object home(HttpServletRequest request) {
 
         ModelAndView model = new ModelAndView();
-        model.setViewName("home");
+        model.setViewName("list_book");
         return model;
 
     }
 
+        @RequestMapping(value = "/photslist", method = RequestMethod.GET)
+    public Object phots(HttpServletRequest request) {
+
+        ModelAndView model = new ModelAndView();
+        model.setViewName("photslist");
+        return model;
+
+    }
     @RequestMapping(value = "/edit_rss_content", method = RequestMethod.GET)
     public Object editrestaurant(HttpServletRequest request, @RequestParam("id") String id) {
 
@@ -231,7 +239,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/get_single_upload_list", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
-    public String get_single_upload_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex) {
+    public byte[] get_single_upload_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex) throws UnsupportedEncodingException {
         String strTid = UUID.randomUUID().toString();
         String strResult = null;
         try {
@@ -245,13 +253,13 @@ public class LoginController {
             json.put("page", page);
             json.put("records", obj.length());
             json.put("rows", obj);
-            return json.toString();
+           return json.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);
-            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid).getBytes("UTF-8");
         } catch (Exception e) {
             logger.error(e);
-            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid).getBytes("UTF-8");
         }
     }
 
@@ -505,10 +513,13 @@ public class LoginController {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } if(type.equalsIgnoreCase("1")){
+             return new ModelAndView("redirect:/list_thoughts");
         }
-        if(type == "2"){
+        else 
+        if(type.equalsIgnoreCase("2")){
             return new ModelAndView("redirect:/list_magazine");
-        }else if(type == "3"){
+        }else if(type.equalsIgnoreCase("3")){
             return new ModelAndView("redirect:/list_audio");
         }else{
             return new ModelAndView("redirect:/list_video");
@@ -553,7 +564,7 @@ public class LoginController {
     }
     
     @RequestMapping(value = "/content_type_list", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
-    public String content_type_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex, @RequestParam("type") String type) {
+    public byte[] content_type_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex, @RequestParam("type") String type) throws UnsupportedEncodingException {
         String strTid = UUID.randomUUID().toString();
         String strResult = null;
         try {
@@ -567,13 +578,13 @@ public class LoginController {
             json.put("page", page);
             json.put("records", obj.length());
             json.put("rows", obj);
-            return json.toString();
+            return json.toString().getBytes("UTF-8");
         } catch (JsonSyntaxException e) {
             logger.error(e);
-            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid).getBytes("UTF-8");
         } catch (Exception e) {
             logger.error(e);
-            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid).getBytes("UTF-8");
         }
     }
     
@@ -636,7 +647,7 @@ public class LoginController {
         JSONObject strResponse = objUserService.edit_magazine(id, ctid);
         HttpSession session = request.getSession();
         session.setAttribute("restdet", strResponse.toString());
-        model.setViewName("edit_video");
+        model.setViewName("edit_thoughts");
         return model;
     }
     
@@ -675,9 +686,12 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(type == "2"){
+        if(type.equalsIgnoreCase("4")){
+             return new ModelAndView("redirect:/list_thoughts");
+        }
+        else if(type.equalsIgnoreCase("2")){
             return new ModelAndView("redirect:/list_magazine");
-        }else if(type == "3"){
+        }else if(type.equalsIgnoreCase("3")){
             return new ModelAndView("redirect:/list_audio");
         }else{
             return new ModelAndView("redirect:/list_video");
@@ -710,4 +724,31 @@ public class LoginController {
         }
         return mainfilename;
     }
+    
+     
+    @RequestMapping(value = "/photolist", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
+    public byte[] photolist(@RequestParam("page") int page, @RequestParam("rows") int endIndex) throws UnsupportedEncodingException {
+        String strTid = UUID.randomUUID().toString();
+        String strResult = null;
+        try {
+            int fromIndex = 0;
+            if (page > 0) {
+                fromIndex = (page - 1) * endIndex;
+            }
+            JSONObject json = new JSONObject();
+            JSONArray obj = objUserService.photolist_list(strTid, fromIndex, endIndex, null);
+            json.put("total", objUserService.photolist_listCount(strTid));
+            json.put("page", page);
+            json.put("records", obj.length());
+            json.put("rows", obj);
+            return json.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid).getBytes("UTF-8");
+        }
+    }
+
 }

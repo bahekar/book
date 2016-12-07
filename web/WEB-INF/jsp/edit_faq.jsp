@@ -19,7 +19,7 @@
                         <label>Answer</label>
                         <textarea placeholder="Answer" id="answer" name="answer" class="input-xlarge">${answer}</textarea><br>
                         <div id="answer_err" class="error-message-input">*Required</div>
-                        <button id="categorysave" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
+                        <button id="categorysave" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Update</button>
                 </div>
 <script type="text/javascript">
     $("#categorysave").click(function () {

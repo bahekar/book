@@ -74,14 +74,15 @@
     <div class="sidebar-nav">
         <a href="home" class="nav-header" data-toggle="collapse">Dashboard</a>
         <ul id="dashboard-menu" class="nav nav-list collapse in">
-            <li><a href="category">Category Listing</a></li>
-            <li><a href="sub_category">Sub-Category Listing</a></li>
-            <li><a href="list_book">Book Listing</a></li>
-            <li><a href="list_faq">FAQ Listing</a></li>
-            <li><a href="list_magazine">Magazine Listing</a></li>
-            <li><a href="list_thoughts">Thoughts Listing</a></li>
-            <li><a href="list_audio">Audio Listing</a></li>
-            <li><a href="list_video">Video Listing</a></li>
+<!--            <li><a href="category">Category Listing</a></li>
+            <li><a href="sub_category">Sub-Category Listing</a></li>-->
+            <li><a href="list_book">Book</a></li>
+            <li><a href="list_faq">FAQ</a></li>
+            <li><a href="list_magazine">Magazine</a></li>
+            <li><a href="list_thoughts">Thoughts</a></li>
+            <li><a href="photslist">Phots</a></li>
+            <li><a href="list_audio">Audio</a></li>
+            <li><a href="list_video">Video</a></li>
             <li><a href="list_ferozan">Sham-E-Ferozan</a></li>
         </ul>
     </div>

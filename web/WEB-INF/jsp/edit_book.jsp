@@ -60,7 +60,7 @@
                                                 <a id="link2" target="_blank">Book Content Link</a>
                                             </div>
 					</div>
-                                        <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
+                                        <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Update</button>
 					
                     </div>
                 </form:form>

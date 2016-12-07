@@ -290,6 +290,14 @@ public class UserService {
         return objUserDAO.content_type_list(transId, fromIndex, endIndex, type);
     }
     
+    public int photolist_listCount(String transId) throws SQLException, Exception {
+        return objUserDAO.photolist_listCount(transId);
+    }
+
+    public JSONArray photolist_list(String transId, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+        return objUserDAO.photolist_list(transId, fromIndex, endIndex, type);
+    }
+    
     public String delete_content_type(String id, String ctid, String strTid) {
         int isUpdated = 0;
         int nUserID = -1;

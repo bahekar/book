@@ -1160,4 +1160,71 @@ public class UserDAO {
         }
         return -1;
     }
+    
+       public JSONArray photolist_list(String strTid, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("query", "SELECT * FROM photos order by id desc LIMIT " + fromIndex + "," + endIndex + "");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(query);
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("image", url + Utilities.nullToEmpty(rs.getString("image")));
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while content_type_list" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while content_type_list" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+
+    public int photolist_listCount(String strTid) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM photos");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        int count = 0;
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(query);
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    count = rs.getInt("count");
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while content_type_listCount" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while content_type_listCount" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return count;
+    }
+
 }

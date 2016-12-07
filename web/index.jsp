@@ -154,7 +154,7 @@
                         code = data.response.code;
 
                         if (code == 0) {
-                          window.location="category";
+                          window.location="list_book";
                         } else if (code == 108) {
                             sweetAlert('Oops...', 'Invalid UserId!', 'error');
 

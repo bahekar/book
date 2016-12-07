@@ -3,7 +3,7 @@
     
     <div class="content">
         <div class="header">
-            <h1 class="page-title">Edit Magazine</h1>
+            <h1 class="page-title">Edit Audio</h1>
         </div>
         <ul class="breadcrumb">
             <li><a href="home">Home</a> <span class="divider">/</span></li>
@@ -36,7 +36,7 @@
                                                     <a id="link" target="_blank">File Link</a>
 						</div>
 					</div>
-                                        <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
+                                        <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Update</button>
 					
 				</div>
                               </form:form>

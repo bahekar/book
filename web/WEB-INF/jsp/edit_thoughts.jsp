@@ -3,7 +3,7 @@
     
     <div class="content">
         <div class="header">
-            <h1 class="page-title">Edit Video</h1>
+            <h1 class="page-title">Edit Thoughts</h1>
         </div>
         <ul class="breadcrumb">
             <li><a href="home">Home</a> <span class="divider">/</span></li>
@@ -15,7 +15,7 @@
                 <form:form method="post" onsubmit="return Categorysave();" action="editcontenttype" enctype="multipart/form-data">
                     <input type="hidden" id="cid" name="cid" >
                     <input type="hidden" id="ctid" name="ctid" >
-                    <input type="hidden" id="type" name="type" value="4" >
+                    <input type="hidden" id="type" name="type" value="1" >
                     <div class="well">
 										
 					<div class="row-fluid">
