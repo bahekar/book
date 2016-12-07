@@ -28,7 +28,7 @@
 
     function childserviceload() {
         $('#tt').datagrid({
-            url: 'get_single_upload_list',
+            url: 'get_single_upload_list?type=1',
             onLoadSuccess: checkchildserviceload
         });
     }

@@ -67,7 +67,7 @@ public class UserDAO {
     static Log logger = LogFactory.getLog(UserDAO.class);
 
     public int addcontent(Content objContent) {
-        String insertQuery = ConfigUtil.getProperty("store.book.query", "INSERT INTO `adminbook`.`book`(`title`,`published_date`,`author_name`,`file_path`,`book_type`,`book_url`) VALUES (?,?,?,?,?,?)");
+        String insertQuery = ConfigUtil.getProperty("store.book.query", "INSERT INTO `adminbook`.`book`(`title`,`published_date`,`author_name`,`file_path`,`book_type`,`book_url`,`type`) VALUES (?,?,?,?,?,?,?)");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -83,6 +83,7 @@ public class UserDAO {
                 pstmt.setString(4, objContent.getFilePath());
                 pstmt.setString(5, objContent.getBook_type());
                 pstmt.setString(6, objContent.getContent_file());
+                pstmt.setString(7, objContent.getType());
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
@@ -197,8 +198,8 @@ public class UserDAO {
         return neighborhoodObj;
     }
 
-    public JSONArray get_single_upload_list(String strTid, int fromIndex, int endIndex) throws SQLException, Exception {
-        String query = ConfigUtil.getProperty("query", "SELECT * FROM book order by published_date asc LIMIT " + fromIndex + "," + endIndex + "");
+    public JSONArray get_single_upload_list(String strTid, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("query", "SELECT * FROM book where type = " + type + " order by published_date asc LIMIT " + fromIndex + "," + endIndex + "");
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -928,6 +929,78 @@ public class UserDAO {
         return -1;
     }
     
+    public int addaudiovideotype(Content objContent) {
+        String insertQuery = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type`(`title`,`type`,`link`) VALUES (?,?,?)");
+        
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+
+                pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+
+                pstmt.setString(1, objContent.getTitle());
+                pstmt.setString(2, objContent.getType());
+                pstmt.setString(3, objContent.getLink());
+                int nRes = pstmt.executeUpdate();
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    nRes = rs.getInt(1);
+                }
+                return nRes;
+            }
+        } catch (SQLException sqle) {
+            logger.error("addaudiovideotype() : Got SQLException " + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+            logger.error("addaudiovideotype() : Got SQLException " + Utilities.getStackTrace(e));
+
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
+    
+    public JSONArray audio_video_list(String strTid, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("query", "SELECT * from content_type where type = "+type+" order by title asc LIMIT " + fromIndex + "," + endIndex + "");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(query);
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                    property.put("link", Utilities.nullToEmpty(rs.getString("link")));
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while audio_video_list" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while audio_video_list" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+    
     public JSONArray content_type_list(String strTid, int fromIndex, int endIndex, String type) throws SQLException, Exception {
         String query = ConfigUtil.getProperty("query", "SELECT ct.id as id, cti.id as ctid, ct.title as title, cti.image as image FROM content_type as ct, content_type_image as cti where ct.id = cti.content_id and ct.type = "+type+" order by ct.title asc LIMIT " + fromIndex + "," + endIndex + "");
 
@@ -1036,6 +1109,41 @@ public class UserDAO {
         return status;
     }
     
+    public int delete_audio_video(String id) throws SQLException, Exception {
+        
+        String delete_audio_video = ConfigUtil.getProperty("delete_audio_video", "DELETE FROM `content_type` WHERE id=?");
+        
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+
+        Connection objConn = null;
+        int status = 0;
+        try {
+            objConn = dbconnection.getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(delete_audio_video);
+                pstmt.setString(1, id);
+                status = pstmt.executeUpdate();
+                
+                logger.debug("no of res deletetd is :" + status);
+
+            } else {
+                logger.error("delete_audio_video(): connection object is null");
+            }
+        } catch (SQLException sqle) {
+            logger.error("delete_content_type() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("delete_audio_video() Got Exception : " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return status;
+    }
+    
     public JSONObject edit_magazine(String id, String ctid) {
         JSONObject neighborhoodObj = new JSONObject();
         String single_details = ConfigUtil.getProperty("details", "SELECT ct.id as id, cti.id as ctid, ct.title as title, cti.image as image FROM content_type as ct, content_type_image as cti where ct.id = " + id + " AND cti.id = " + ctid);
@@ -1056,6 +1164,38 @@ public class UserDAO {
                     neighborhoodObj.put("ctid", Utilities.nullToEmpty(rs.getString("ctid")));
                     neighborhoodObj.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     neighborhoodObj.put("image", url + Utilities.nullToEmpty(rs.getString("image")));
+                }
+            }
+        } catch (Exception e) {
+            logger.error(" Got book" + Utilities.getStackTrace(e));
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+                dbconnection.closeConnection(rs1, pstmt1, objConn);
+            }
+        }
+        return neighborhoodObj;
+    }
+    
+    public JSONObject edit_audio_video_view(String id) {
+        JSONObject neighborhoodObj = new JSONObject();
+        String single_details = ConfigUtil.getProperty("details", "SELECT * from content_type where id = " + id);
+        ResultSet rs = null;
+        ResultSet rs1 = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement pstmt1 = null;
+        Connection objConn = null;
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(single_details);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    neighborhoodObj.put("id", Utilities.nullToEmpty(rs.getString("id")));
+                    neighborhoodObj.put("title", Utilities.nullToEmpty(rs.getString("title")));
+                    neighborhoodObj.put("link", Utilities.nullToEmpty(rs.getString("link")));
                 }
             }
         } catch (Exception e) {
@@ -1110,6 +1250,42 @@ public class UserDAO {
 
         } catch (Exception e) {
             logger.error("edit editcontenttype() : Got SQLException " + Utilities.getStackTrace(e));
+
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
+    
+    public int editaudiovideo(Content objContent) {
+        String updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type` SET `title`=?, link=? where id=? ");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement pstmt1 = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+                
+                pstmt.setString(1, objContent.getTitle());
+                pstmt.setString(2, objContent.getLink());
+                pstmt.setString(3, objContent.getCid());
+              
+                int nRes = pstmt.executeUpdate();
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    nRes = rs.getInt(1);
+                }                
+                return nRes;
+            }
+        } catch (SQLException sqle) {
+            logger.error("edit editaudiovideo() : Got SQLException " + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+            logger.error("edit editaudiovideo() : Got SQLException " + Utilities.getStackTrace(e));
 
         } finally {
             if (objConn != null) {

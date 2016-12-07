@@ -28,7 +28,7 @@
 
     function childserviceload() {
         $('#tt').datagrid({
-            url: 'content_type_list?type=3',
+            url: 'audio_video_list?type=3',
             onLoadSuccess: checkchildserviceload
         });
     }
@@ -37,7 +37,7 @@
         htmocontent = '<div class="well"><table class="table"><thead><tr>';
         htmocontent = htmocontent + '<th>#</th>';
         htmocontent = htmocontent + '<th>Title</th>';
-        htmocontent = htmocontent + '<th>Image</th>';
+        htmocontent = htmocontent + '<th>Link</th>';
         htmocontent = htmocontent + '<th>Edit</th>';
         htmocontent = htmocontent + '<th>Delete</th>';
         htmocontent = htmocontent + '</tr></thead><tbody>';
@@ -46,21 +46,21 @@
             htmocontent = htmocontent + '<tr>';
             htmocontent = htmocontent + '<td>' + selectedRow.id + '</td>';
             htmocontent = htmocontent + '<td>' + selectedRow.title + '</td>';
-            htmocontent = htmocontent + '<td><a href="' + selectedRow.image + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
-             htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ', ' + selectedRow.ctid + ')" >Edit</a></td>';
-            htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +', ' + selectedRow.ctid + ')">Delete</a></td>';
+            htmocontent = htmocontent + '<td>' + selectedRow.link + '</td>';
+             htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ')" >Edit</a></td>';
+            htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +')">Delete</a></td>';
             htmocontent = htmocontent + '</tr>';
         }
         htmocontent = htmocontent + '</tbody></table></div>';
         $("#ctl00_cph_divWorkAreaContent").html(htmocontent);
     }
-    function editcontent(id, ctid){
-        window.location="edit_audio?id="+id+"&ctid="+ctid;
+    function editcontent(id){
+        window.location="edit_audio?id="+id;
     }
-    function deletecontent(id, ctid) {
+    function deletecontent(id) {
         swal({title: "Are you sure?", text: "You want to delete this audio!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
             $.ajax({
-                url: "delete_content_type?id=" + id + "&ctid=" + ctid,
+                url: "delete_audio_video?id=" + id,
                 type: "GET",
                 dataType: "json",
                 contentType: "application/json",

@@ -12,9 +12,8 @@
         <div class="container-fluid">
             <div class="row-fluid">
                 <br><br><br>
-                <form:form method="post" onsubmit="return Categorysave();" action="editcontenttype" enctype="multipart/form-data">
+                <form:form method="post" onsubmit="return Categorysave();" action="editaudiovideo" enctype="multipart/form-data">
                     <input type="hidden" id="cid" name="cid" >
-                    <input type="hidden" id="ctid" name="ctid" >
                     <input type="hidden" id="type" name="type" value="3" >
                     <div class="well">
 										
@@ -29,11 +28,10 @@
 					
 					<div class="row-fluid">
                                                 <div class="span6">
-							<div class="span4">Upload File*</div>
-                                         <input type="file" id="excel" name="file[]" class="input-xlarge" style="border: 1px solid #ccc;">
+							<div class="span4">Link*</div>
+                                            <input type="text" id="link" name="link" placeholder="Link" class="input-xlarge">
                      			</div>
 						<div class="span6">
-                                                    <a id="link" target="_blank">File Link</a>
 						</div>
 					</div>
                                         <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Update</button>
@@ -49,21 +47,26 @@
     function loadresjson(obj) 
     {
         $("#cid").val(obj.id);
-        $("#ctid").val(obj.ctid);
         $("#title").val(obj.title);
-        $("#link").attr("href", obj.image);
+        $("#link").val(obj.link);
     }
           function Categorysave()  {
                 var contentnamejson = {};
                 iserror = false;
                 title = $("#title").val();
-                excel = $("#excel").val();
+                link = $("#link").val();
                 
                 if (title == '') {
                     addclass('title');
                     iserror = true;
                 } else {
                     removeclass('title');
+                }
+                if (link == '') {
+                    addclass('link');
+                    iserror = true;
+                } else {
+                    removeclass('link');
                 }
                 
                 if (iserror) {

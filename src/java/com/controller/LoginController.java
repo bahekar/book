@@ -116,7 +116,7 @@ public class LoginController {
     String VIR_DIR = ConfigUtil.getProperty("VIR_DIR", "E:\\aqa\\menubook\\filepath");
 
     @RequestMapping(value = "/addcontent", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView addcontent(@RequestParam("file[]") MultipartFile[] files, @RequestParam("content_file[]") MultipartFile[] content_file, @RequestParam(value = "book_title", required = false) String book_title, @RequestParam(value = "published_date", required = false) String published_date, @RequestParam(value = "author_name", required = false) String author_name, @RequestParam(value = "book_type", required = false) String book_type, HttpSession httpSession) {
+    public ModelAndView addcontent(@RequestParam("file[]") MultipartFile[] files, @RequestParam("content_file[]") MultipartFile[] content_file, @RequestParam(value = "book_title", required = false) String book_title, @RequestParam(value = "published_date", required = false) String published_date, @RequestParam(value = "author_name", required = false) String author_name, @RequestParam(value = "book_type", required = false) String book_type, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
         String response = "";
         String mainfilename = "";
         Content objContent = new Content();
@@ -125,7 +125,7 @@ public class LoginController {
             objContent.setPublished_date(published_date);
             objContent.setAuthor_name(author_name);
             objContent.setBook_type(book_type);
-            
+            objContent.setType(type);
 //            for (MultipartFile multipartfile : files) {
 //                if (multipartfile != null && multipartfile.getOriginalFilename() != null && multipartfile.getOriginalFilename() != "") {
 //                    byte[] bytes = multipartfile.getBytes();
@@ -168,7 +168,11 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ModelAndView("redirect:/list_book");
+        if(type.equalsIgnoreCase("1")){
+            return new ModelAndView("redirect:/list_book");
+        }else{
+            return new ModelAndView("redirect:/list_faq");
+        }
     }
     
     @RequestMapping(value = "/edit_content", method = RequestMethod.POST, produces = {"application/json"})
@@ -239,7 +243,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/get_single_upload_list", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
-    public byte[] get_single_upload_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex) throws UnsupportedEncodingException {
+    public byte[] get_single_upload_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex, @RequestParam("type") String type) throws UnsupportedEncodingException {
         String strTid = UUID.randomUUID().toString();
         String strResult = null;
         try {
@@ -248,7 +252,7 @@ public class LoginController {
                 fromIndex = (page - 1) * endIndex;
             }
             JSONObject json = new JSONObject();
-            JSONArray obj = objUserService.get_single_upload_list(strTid, fromIndex, endIndex);
+            JSONArray obj = objUserService.get_single_upload_list(strTid, fromIndex, endIndex, type);
             json.put("total", objUserService.get_single_upload_listCount(strTid));
             json.put("page", page);
             json.put("records", obj.length());
@@ -313,6 +317,17 @@ public class LoginController {
         HttpSession session = request.getSession();
         session.setAttribute("restdet", strResponse.toString());
         model.setViewName("edit_book");
+        return model;
+    }
+    
+    @RequestMapping(value = "/edit_faq", method = RequestMethod.GET)
+    public Object edit_faq(HttpServletRequest request, @RequestParam("id") String id) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_book(id);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_faq");
         return model;
     }
 
@@ -513,11 +528,36 @@ public class LoginController {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } if(type.equalsIgnoreCase("1")){
+        } 
+        if(type.equalsIgnoreCase("1")){
              return new ModelAndView("redirect:/list_thoughts");
+        }else if(type.equalsIgnoreCase("2")){
+            return new ModelAndView("redirect:/list_magazine");
+        }else if(type.equalsIgnoreCase("3")){
+            return new ModelAndView("redirect:/list_audio");
+        }else{
+            return new ModelAndView("redirect:/list_video");
         }
-        else 
-        if(type.equalsIgnoreCase("2")){
+    }
+    
+    @RequestMapping(value = "/addaudiovideotype", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView addaudiovideotype(@RequestParam(value = "link", required = false) String link, @RequestParam(value = "title", required = false) String title, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setLink(link);
+            objContent.setTitle(title);
+            objContent.setType(type);
+
+            response = objUserService.addaudiovideotype(objContent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        if(type.equalsIgnoreCase("1")){
+             return new ModelAndView("redirect:/list_thoughts");
+        }else if(type.equalsIgnoreCase("2")){
             return new ModelAndView("redirect:/list_magazine");
         }else if(type.equalsIgnoreCase("3")){
             return new ModelAndView("redirect:/list_audio");
@@ -563,6 +603,31 @@ public class LoginController {
         return new ModelAndView("redirect:/list_thoughts");
     }
     
+    @RequestMapping(value = "/audio_video_list", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
+    public byte[] audio_video_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex, @RequestParam("type") String type) throws UnsupportedEncodingException {
+        String strTid = UUID.randomUUID().toString();
+        String strResult = null;
+        try {
+            int fromIndex = 0;
+            if (page > 0) {
+                fromIndex = (page - 1) * endIndex;
+            }
+            JSONObject json = new JSONObject();
+            JSONArray obj = objUserService.audio_video_list(strTid, fromIndex, endIndex, type);
+            json.put("total", objUserService.content_type_listCount(strTid));
+            json.put("page", page);
+            json.put("records", obj.length());
+            json.put("rows", obj);
+            return json.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid).getBytes("UTF-8");
+        }
+    }
+    
     @RequestMapping(value = "/content_type_list", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
     public byte[] content_type_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex, @RequestParam("type") String type) throws UnsupportedEncodingException {
         String strTid = UUID.randomUUID().toString();
@@ -596,6 +661,14 @@ public class LoginController {
         return strResponse;
     }
     
+    @RequestMapping(value = "/delete_audio_video", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+    public String delete_audio_video(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) {
+        String transId = UUID.randomUUID().toString();
+        String strResponse = objUserService.delete_audio_video(id, transId);
+
+        return strResponse;
+    }
+    
     @RequestMapping(value = "/edit_magazine", method = RequestMethod.GET)
     public Object edit_magazine(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
 
@@ -619,10 +692,10 @@ public class LoginController {
     }
     
     @RequestMapping(value = "/edit_audio", method = RequestMethod.GET)
-    public Object edit_audio(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
+    public Object edit_audio(HttpServletRequest request, @RequestParam("id") String id) {
 
         ModelAndView model = new ModelAndView();
-        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
+        JSONObject strResponse = objUserService.edit_audio_video_view(id);
         HttpSession session = request.getSession();
         session.setAttribute("restdet", strResponse.toString());
         model.setViewName("edit_audio");
@@ -630,10 +703,10 @@ public class LoginController {
     }
     
     @RequestMapping(value = "/edit_video", method = RequestMethod.GET)
-    public Object edit_video(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
+    public Object edit_video(HttpServletRequest request, @RequestParam("id") String id) {
 
         ModelAndView model = new ModelAndView();
-        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
+        JSONObject strResponse = objUserService.edit_audio_video_view(id);
         HttpSession session = request.getSession();
         session.setAttribute("restdet", strResponse.toString());
         model.setViewName("edit_video");
@@ -687,6 +760,34 @@ public class LoginController {
             e.printStackTrace();
         }
         if(type.equalsIgnoreCase("4")){
+             return new ModelAndView("redirect:/list_thoughts");
+        }
+        else if(type.equalsIgnoreCase("2")){
+            return new ModelAndView("redirect:/list_magazine");
+        }else if(type.equalsIgnoreCase("3")){
+            return new ModelAndView("redirect:/list_audio");
+        }else{
+            return new ModelAndView("redirect:/list_video");
+        }
+    }
+    
+    @RequestMapping(value = "/editaudiovideo", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView editaudiovideo(@RequestParam(value = "title", required = false) String title, @RequestParam(value = "cid", required = false) String cid, @RequestParam(value = "link", required = false) String link, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setTitle(title);
+            objContent.setCid(cid);
+            objContent.setLink(link);
+            objContent.setType(type);
+
+           response = objUserService.editaudiovideo(objContent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(type.equalsIgnoreCase("1")){
              return new ModelAndView("redirect:/list_thoughts");
         }
         else if(type.equalsIgnoreCase("2")){

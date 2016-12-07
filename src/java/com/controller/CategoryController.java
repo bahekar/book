@@ -366,25 +366,6 @@ public class CategoryController {
         return strResponse;
     }
 
-    @RequestMapping(value = "/edit_faq", method = RequestMethod.GET)
-    public Object edit_faq(HttpServletRequest request, @RequestParam(value = "id", required = false) String id) {
-
-        ModelAndView model = new ModelAndView();
-        String transId = UUID.randomUUID().toString();
-        model.setViewName("edit_faq");
-        HttpSession session = request.getSession();
-        JSONObject strResponse = objUserService.getFAQ_details(transId, id);
-        try {
-            session.setAttribute("question", strResponse.get("question"));
-            session.setAttribute("answer", strResponse.get("answer"));
-            // session.setAttribute("id", strResponse.get("id"));
-            //  session.setAttribute("description", strResponse.get("description"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return model;
-    }
-
     @RequestMapping(value = "/faqupdate", method = RequestMethod.GET, produces = {"application/json"})
     public String faqupdate(@RequestParam("question") String question, @RequestParam("answer") String answer, @RequestParam("id") String id, HttpSession httpSession) {
         String response = "";

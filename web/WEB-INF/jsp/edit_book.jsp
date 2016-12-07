@@ -33,7 +33,7 @@
 						<div class="span6">
 							<div class="span4">Language Type*</div>
                                                         <select id="book_type" name="book_type">
-                                                            <option value="">Select Book Type</option>
+                                                            <option value="">Select Language Type</option>
                                                             <option value="1">English</option>
                                                             <option value="2">Hindi</option>
                                                             <option value="3">Urdu</option>

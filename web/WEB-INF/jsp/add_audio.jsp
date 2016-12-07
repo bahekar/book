@@ -12,7 +12,7 @@
         <div class="container-fluid">
             <div class="row-fluid">
                 <br><br><br>
-                <form:form method="post" onsubmit="return Categorysave();" action="addcontenttype" enctype="multipart/form-data">
+                <form:form method="post" onsubmit="return Categorysave();" action="addaudiovideotype" enctype="multipart/form-data">
                     <input type="hidden" id="type" name="type" value="3">
                     <div class="well">
 										
@@ -27,8 +27,8 @@
 					
 					<div class="row-fluid">
                                                 <div class="span6">
-							<div class="span4">Upload File*</div>
-                                         <input type="file" id="excel" name="file[]" class="input-xlarge" style="border: 1px solid #ccc;">
+							<div class="span4">Link*</div>
+                                            <input type="text" id="link" name="link" placeholder="Link" class="input-xlarge">
                      			</div>
 						<div class="span6">
 						</div>
@@ -43,7 +43,7 @@
                 var contentnamejson = {};
                 iserror = false;
                 title = $("#title").val();
-                excel = $("#excel").val();
+                link = $("#link").val();
                 
                 if (title == '') {
                     addclass('title');
@@ -51,11 +51,11 @@
                 } else {
                     removeclass('title');
                 }
-                if (excel == '') {
-                    addclass('excel');
+                if (link == '') {
+                    addclass('link');
                     iserror = true;
                 } else {
-                    removeclass('excel');
+                    removeclass('link');
                 }
                 if (iserror) {
                     return false;

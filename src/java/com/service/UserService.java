@@ -94,8 +94,8 @@ public class UserService {
         return objUserDAO.get_single_upload_listCount(transId);
     }
 
-    public JSONArray get_single_upload_list(String transId, int fromIndex, int endIndex) throws SQLException, Exception {
-        return objUserDAO.get_single_upload_list(transId, fromIndex, endIndex);
+    public JSONArray get_single_upload_list(String transId, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+        return objUserDAO.get_single_upload_list(transId, fromIndex, endIndex, type);
     }
     
     public String delete_single_upload(String id, String strTid) {
@@ -262,6 +262,26 @@ public class UserService {
         }
     }
     
+    public String addaudiovideotype(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.addaudiovideotype(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in addaudiovideotype(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
     public String addthoughts(Content objContent) {
         int isUpdated = 0;
         int nUserID = -1;
@@ -288,6 +308,10 @@ public class UserService {
 
     public JSONArray content_type_list(String transId, int fromIndex, int endIndex, String type) throws SQLException, Exception {
         return objUserDAO.content_type_list(transId, fromIndex, endIndex, type);
+    }
+    
+    public JSONArray audio_video_list(String transId, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+        return objUserDAO.audio_video_list(transId, fromIndex, endIndex, type);
     }
     
     public int photolist_listCount(String transId) throws SQLException, Exception {
@@ -317,8 +341,31 @@ public class UserService {
         }
     }
     
+    public String delete_audio_video(String id, String strTid) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        try {
+
+            isUpdated = objUserDAO.delete_audio_video(id);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponsetoken(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in delete_single_upload(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
     public JSONObject edit_magazine(String id, String ctid) {
         return objUserDAO.edit_magazine(id, ctid);
+    }
+    
+    public JSONObject edit_audio_video_view(String id) {
+        return objUserDAO.edit_audio_video_view(id);
     }
     
     public String editcontenttype(Content objContent) {
@@ -340,4 +387,25 @@ public class UserService {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
+    
+    public String editaudiovideo(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.editaudiovideo(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in editcontenttype(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    
 }

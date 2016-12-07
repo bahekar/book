@@ -13,7 +13,7 @@
             <div class="row-fluid">
 		<br><br><br>
                 <form:form method="post" onsubmit="return Categorysave();" action="addcontent"  enctype="multipart/form-data">
-
+                    <input type="hidden" name="type" value="1">
                     <div class="well">
 					<div class="row-fluid">
 						<div class="span6">
@@ -34,7 +34,7 @@
 						<div class="span6">
 							<div class="span4">Language Type*</div>
                                                         <select id="book_type" name="book_type">
-                                                            <option value="">Select Book Type</option>
+                                                            <option value="">Select Language Type</option>
                                                             <option value="1">English</option>
                                                             <option value="2">Hindi</option>
                                                             <option value="3">Urdu</option>

@@ -34,6 +34,7 @@ public class Content {
     private String book_title;
     private String content_file;
     private String book_type;
+    private String link;
     /**
      * @return the contentname
      */
@@ -368,5 +369,19 @@ public class Content {
      */
     public void setBook_type(String book_type) {
         this.book_type = book_type;
+    }
+
+    /**
+     * @return the link
+     */
+    public String getLink() {
+        return link;
+    }
+
+    /**
+     * @param link the link to set
+     */
+    public void setLink(String link) {
+        this.link = link;
     }
 }
