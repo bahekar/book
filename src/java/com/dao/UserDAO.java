@@ -165,6 +165,40 @@ public class UserDAO {
         }
         return -1;
     }
+    
+    public int addphoto(Content objContent) {
+        String insertQuery = ConfigUtil.getProperty("addphoto", "INSERT INTO `adminbook`.`photos`(`image`) VALUES (?)");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+
+                pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+
+                pstmt.setString(1, objContent.getFilePath());
+                
+                int nRes = pstmt.executeUpdate();
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    nRes = rs.getInt(1);
+                }
+                return nRes;
+            }
+        } catch (SQLException sqle) {
+            logger.error("addphoto() : Got SQLException " + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+            logger.error("addphoto() : Got SQLException " + Utilities.getStackTrace(e));
+
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
 
     public JSONObject edit_rss_content(String id) {
         JSONObject neighborhoodObj = new JSONObject();
@@ -293,6 +327,38 @@ public class UserDAO {
             throw new SQLException(sqle.getMessage());
         } catch (Exception e) {
             logger.error("delete_single_upload() Got Exception : " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return status;
+    }
+    public int delete_photo(String id) throws SQLException, Exception {
+        String delete_single_upload = ConfigUtil.getProperty("delete_photo", "DELETE FROM `photos` WHERE id=?");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+
+        Connection objConn = null;
+        int status = 0;
+        try {
+            objConn = dbconnection.getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(delete_single_upload);
+                pstmt.setString(1, id);
+                status = pstmt.executeUpdate();
+
+                logger.debug("no of res deletetd is :" + status);
+
+            } else {
+                logger.error("delete_photo(): connection object is null");
+            }
+        } catch (SQLException sqle) {
+            logger.error("delete_photo() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("delete_photo() Got Exception : " + Utilities.getStackTrace(e));
             throw new Exception(e.getMessage());
         } finally {
             if (objConn != null) {
@@ -930,7 +996,7 @@ public class UserDAO {
     }
     
     public int addaudiovideotype(Content objContent) {
-        String insertQuery = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type`(`title`,`type`,`link`) VALUES (?,?,?)");
+        String insertQuery = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type`(`title`,`type`,`link`,`lang_type`) VALUES (?,?,?,?)");
         
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -944,6 +1010,7 @@ public class UserDAO {
                 pstmt.setString(1, objContent.getTitle());
                 pstmt.setString(2, objContent.getType());
                 pstmt.setString(3, objContent.getLink());
+                pstmt.setString(4, objContent.getBook_type());
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
@@ -1196,6 +1263,7 @@ public class UserDAO {
                     neighborhoodObj.put("id", Utilities.nullToEmpty(rs.getString("id")));
                     neighborhoodObj.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     neighborhoodObj.put("link", Utilities.nullToEmpty(rs.getString("link")));
+                    neighborhoodObj.put("book_type", Utilities.nullToEmpty(rs.getString("lang_type")));
                 }
             }
         } catch (Exception e) {
@@ -1260,7 +1328,7 @@ public class UserDAO {
     }
     
     public int editaudiovideo(Content objContent) {
-        String updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type` SET `title`=?, link=? where id=? ");
+        String updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type` SET `title`=?, link=?, lang_type=? where id=? ");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         PreparedStatement pstmt1 = null;
@@ -1272,7 +1340,8 @@ public class UserDAO {
                 
                 pstmt.setString(1, objContent.getTitle());
                 pstmt.setString(2, objContent.getLink());
-                pstmt.setString(3, objContent.getCid());
+                pstmt.setString(3, objContent.getBook_type());
+                pstmt.setString(4, objContent.getCid());
               
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
@@ -1337,7 +1406,7 @@ public class UserDAO {
         return -1;
     }
     
-       public JSONArray photolist_list(String strTid, int fromIndex, int endIndex, String type) throws SQLException, Exception {
+       public JSONArray photolist_list(String strTid, int fromIndex, int endIndex) throws SQLException, Exception {
         String query = ConfigUtil.getProperty("query", "SELECT * FROM photos order by id desc LIMIT " + fromIndex + "," + endIndex + "");
 
         ResultSet rs = null;

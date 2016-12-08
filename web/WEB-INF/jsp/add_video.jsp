@@ -33,6 +33,22 @@
 						<div class="span6">
 						</div>
 					</div>
+                                        <div class="row-fluid">
+                                               
+						<div class="span6">
+							<div class="span4">Language Type*</div>
+                                                        <select id="book_type" name="book_type">
+                                                            <option value="">Select Language Type</option>
+                                                            <option value="1">English</option>
+                                                            <option value="2">Hindi</option>
+                                                            <option value="3">Urdu</option>
+                                                            <option value="4">Arabic</option>
+							</select>
+						</div>
+                                                 <div class="span6">
+							
+						</div>
+					</div>
                                         <button id="addcontent" class="btn btn-primary btn-sign-in"><i class="icon-save"></i> Save</button>
 					
 				</div>
@@ -44,7 +60,7 @@
                 iserror = false;
                 title = $("#title").val();
                 link = $("#link").val();
-                
+                book_type = $("#book_type").val();
                 if (title == '') {
                     addclass('title');
                     iserror = true;
@@ -56,6 +72,12 @@
                     iserror = true;
                 } else {
                     removeclass('link');
+                }
+                if (book_type == '') {
+                    addclass('book_type');
+                    iserror = true;
+                } else {
+                    removeclass('book_type');
                 }
                 if (iserror) {
                     return false;

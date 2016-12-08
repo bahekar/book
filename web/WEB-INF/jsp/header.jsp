@@ -80,7 +80,7 @@
             <li><a href="list_faq">FAQ</a></li>
             <li><a href="list_magazine">Magazine</a></li>
             <li><a href="list_thoughts">Thoughts</a></li>
-            <li><a href="photslist">Phots</a></li>
+            <li><a href="photslist">Photos</a></li>
             <li><a href="list_audio">Audio</a></li>
             <li><a href="list_video">Video</a></li>
             <li><a href="list_ferozan">Sham-E-Ferozan</a></li>

@@ -35,7 +35,7 @@ public class ContextListener implements ServletContextListener {
             configPath = "E:\\aqa\\bookmanagement\\config\\bookapi.properties";
         }
 
-//     configPath = "/api/config/bookapi.properties";
+//    configPath = "/api/config/bookapi.properties";
         if (configPath != null && configPath.length() > 0) {
             ConfigUtil configUtil = new ConfigUtil();
 //            try {

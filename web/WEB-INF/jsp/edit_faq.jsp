@@ -13,6 +13,7 @@
 		<br><br><br>
 		<form:form method="post" onsubmit="return Categorysave();" action="edit_content"  enctype="multipart/form-data">
                     <input type="hidden" id="book_id" name="book_id">
+                    <input type="hidden" name="type" value="2">
                     <div class="well">
 					<div class="row-fluid">
 						<div class="span6">

@@ -85,6 +85,25 @@ public class UserService {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
+    public String addphoto(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.addphoto(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in add book(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
    
     public JSONObject edit_rss_content(String id) {
         return objUserDAO.edit_rss_content(id);
@@ -113,6 +132,22 @@ public class UserService {
 
         } catch (Exception e) {
             logger.error("Exception in delete_single_upload(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+    public String delete_photo(String id, String strTid) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        try {
+            isUpdated = objUserDAO.delete_photo(id);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponsetoken(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            }
+        } catch (Exception e) {
+            logger.error("Exception in delete_photo(),ex:" + e.getMessage(), e);
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
@@ -318,8 +353,8 @@ public class UserService {
         return objUserDAO.photolist_listCount(transId);
     }
 
-    public JSONArray photolist_list(String transId, int fromIndex, int endIndex, String type) throws SQLException, Exception {
-        return objUserDAO.photolist_list(transId, fromIndex, endIndex, type);
+    public JSONArray photolist_list(String transId, int fromIndex, int endIndex) throws SQLException, Exception {
+        return objUserDAO.photolist_list(transId, fromIndex, endIndex);
     }
     
     public String delete_content_type(String id, String ctid, String strTid) {

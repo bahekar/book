@@ -170,13 +170,19 @@ public class LoginController {
         }
         if(type.equalsIgnoreCase("1")){
             return new ModelAndView("redirect:/list_book");
-        }else{
+        }else if(type.equalsIgnoreCase("2")){
             return new ModelAndView("redirect:/list_faq");
+        }else if(type.equalsIgnoreCase("3")){
+            return new ModelAndView("redirect:/list_magazine");
+        }else if(type.equalsIgnoreCase("4")){
+            return new ModelAndView("redirect:/list_thoughts");
+        }else{
+            return new ModelAndView("redirect:/list_ferozan");
         }
     }
     
     @RequestMapping(value = "/edit_content", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView edit_content(@RequestParam(value = "book_id", required = false) String id, @RequestParam("file[]") MultipartFile[] files, @RequestParam("content_file[]") MultipartFile[] content_file, @RequestParam(value = "book_title", required = false) String book_title, @RequestParam(value = "book_type", required = false) String book_type, @RequestParam(value = "published_date", required = false) String published_date, @RequestParam(value = "author_name", required = false) String author_name, HttpSession httpSession) {
+    public ModelAndView edit_content(@RequestParam(value = "book_id", required = false) String id, @RequestParam("file[]") MultipartFile[] files, @RequestParam("content_file[]") MultipartFile[] content_file, @RequestParam(value = "book_title", required = false) String book_title, @RequestParam(value = "book_type", required = false) String book_type, @RequestParam(value = "published_date", required = false) String published_date, @RequestParam(value = "author_name", required = false) String author_name, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
         String response = "";
         String mainfilename = "";
         Content objContent = new Content();
@@ -229,9 +235,33 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ModelAndView("redirect:/list_book");
+        if(type.equalsIgnoreCase("1")){
+            return new ModelAndView("redirect:/list_book");
+        }else if(type.equalsIgnoreCase("2")){
+            return new ModelAndView("redirect:/list_faq");
+        }else if(type.equalsIgnoreCase("3")){
+            return new ModelAndView("redirect:/list_magazine");
+        }else if(type.equalsIgnoreCase("4")){
+            return new ModelAndView("redirect:/list_thoughts");
+        }else{
+            return new ModelAndView("redirect:/list_ferozan");
+        }
     }
+    @RequestMapping(value = "/addphoto", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView addphoto(@RequestParam("file[]") MultipartFile[] files, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setFilePath(Writefile(files));
 
+            response = objUserService.addphoto(objContent);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("redirect:/photslist");
+    }
 
     @RequestMapping(value = "/list_book", method = RequestMethod.GET)
     public Object list_book(HttpServletRequest request) {
@@ -271,6 +301,13 @@ public class LoginController {
     public String delete_single_upload(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) {
         String transId = UUID.randomUUID().toString();
         String strResponse = objUserService.delete_single_upload(id, transId);
+
+        return strResponse;
+    }
+    @RequestMapping(value = "/delete_photo", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+    public String delete_photo(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) {
+        String transId = UUID.randomUUID().toString();
+        String strResponse = objUserService.delete_photo(id, transId);
 
         return strResponse;
     }
@@ -328,6 +365,36 @@ public class LoginController {
         HttpSession session = request.getSession();
         session.setAttribute("restdet", strResponse.toString());
         model.setViewName("edit_faq");
+        return model;
+    }
+    @RequestMapping(value = "/edit_magazine", method = RequestMethod.GET)
+    public Object edit_magazine(HttpServletRequest request, @RequestParam("id") String id) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_book(id);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_magazine");
+        return model;
+    }
+    @RequestMapping(value = "/edit_thoughts", method = RequestMethod.GET)
+    public Object edit_thoughts(HttpServletRequest request, @RequestParam("id") String id) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_book(id);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_thoughts");
+        return model;
+    }
+    @RequestMapping(value = "/edit_ferozan", method = RequestMethod.GET)
+    public Object edit_ferozan(HttpServletRequest request, @RequestParam("id") String id) {
+
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_book(id);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_ferozan");
         return model;
     }
 
@@ -541,7 +608,7 @@ public class LoginController {
     }
     
     @RequestMapping(value = "/addaudiovideotype", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView addaudiovideotype(@RequestParam(value = "link", required = false) String link, @RequestParam(value = "title", required = false) String title, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
+    public ModelAndView addaudiovideotype(@RequestParam(value = "link", required = false) String link, @RequestParam(value = "title", required = false) String title, @RequestParam(value = "type", required = false) String type, @RequestParam(value = "book_type", required = false) String book_type, HttpSession httpSession) {
         String response = "";
         String mainfilename = "";
         Content objContent = new Content();
@@ -549,6 +616,7 @@ public class LoginController {
             objContent.setLink(link);
             objContent.setTitle(title);
             objContent.setType(type);
+            objContent.setBook_type(book_type);
 
             response = objUserService.addaudiovideotype(objContent);
 
@@ -669,27 +737,7 @@ public class LoginController {
         return strResponse;
     }
     
-    @RequestMapping(value = "/edit_magazine", method = RequestMethod.GET)
-    public Object edit_magazine(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
-
-        ModelAndView model = new ModelAndView();
-        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
-        HttpSession session = request.getSession();
-        session.setAttribute("restdet", strResponse.toString());
-        model.setViewName("edit_magazine");
-        return model;
-    }
     
-    @RequestMapping(value = "/edit_ferozan", method = RequestMethod.GET)
-    public Object edit_ferozan(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
-
-        ModelAndView model = new ModelAndView();
-        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
-        HttpSession session = request.getSession();
-        session.setAttribute("restdet", strResponse.toString());
-        model.setViewName("edit_ferozan");
-        return model;
-    }
     
     @RequestMapping(value = "/edit_audio", method = RequestMethod.GET)
     public Object edit_audio(HttpServletRequest request, @RequestParam("id") String id) {
@@ -713,16 +761,7 @@ public class LoginController {
         return model;
     }
     
-    @RequestMapping(value = "/edit_thoughts", method = RequestMethod.GET)
-    public Object edit_thoughts(HttpServletRequest request, @RequestParam("id") String id, @RequestParam("ctid") String ctid) {
-
-        ModelAndView model = new ModelAndView();
-        JSONObject strResponse = objUserService.edit_magazine(id, ctid);
-        HttpSession session = request.getSession();
-        session.setAttribute("restdet", strResponse.toString());
-        model.setViewName("edit_thoughts");
-        return model;
-    }
+    
     
     @RequestMapping(value = "/editcontenttype", method = RequestMethod.POST, produces = {"application/json"})
     public ModelAndView editcontenttype(@RequestParam(value = "title", required = false) String title,@RequestParam("file[]") MultipartFile[] files, @RequestParam(value = "cid", required = false) String cid, @RequestParam(value = "ctid", required = false) String ctid, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
@@ -772,7 +811,7 @@ public class LoginController {
     }
     
     @RequestMapping(value = "/editaudiovideo", method = RequestMethod.POST, produces = {"application/json"})
-    public ModelAndView editaudiovideo(@RequestParam(value = "title", required = false) String title, @RequestParam(value = "cid", required = false) String cid, @RequestParam(value = "link", required = false) String link, @RequestParam(value = "type", required = false) String type, HttpSession httpSession) {
+    public ModelAndView editaudiovideo(@RequestParam(value = "title", required = false) String title, @RequestParam(value = "cid", required = false) String cid, @RequestParam(value = "link", required = false) String link, @RequestParam(value = "type", required = false) String type, @RequestParam(value = "book_type", required = false) String book_type, HttpSession httpSession) {
         String response = "";
         String mainfilename = "";
         Content objContent = new Content();
@@ -781,6 +820,7 @@ public class LoginController {
             objContent.setCid(cid);
             objContent.setLink(link);
             objContent.setType(type);
+            objContent.setBook_type(book_type);
 
            response = objUserService.editaudiovideo(objContent);
 
@@ -837,7 +877,7 @@ public class LoginController {
                 fromIndex = (page - 1) * endIndex;
             }
             JSONObject json = new JSONObject();
-            JSONArray obj = objUserService.photolist_list(strTid, fromIndex, endIndex, null);
+            JSONArray obj = objUserService.photolist_list(strTid, fromIndex, endIndex);
             json.put("total", objUserService.photolist_listCount(strTid));
             json.put("page", page);
             json.put("records", obj.length());
@@ -850,6 +890,15 @@ public class LoginController {
             logger.error(e);
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid).getBytes("UTF-8");
         }
+    }
+    
+    @RequestMapping(value = "/add_photo", method = RequestMethod.GET)
+    public Object add_photo(HttpServletRequest request) {
+
+        ModelAndView model = new ModelAndView();
+        model.setViewName("add_photo");
+        return model;
+
     }
 
 }

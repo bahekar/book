@@ -1,16 +1,16 @@
 <%@include file="header.jsp" %>   
 <div class="content">
     <div class="header">
-        <h1 class="page-title">List Magazine</h1>
+        <h1 class="page-title">List Photos</h1>
     </div>
     <ul class="breadcrumb">
         <li><a href="home">Dashboard</a> <span class="divider">/</span></li>
-        <li class="active">List Magazine</li>
+        <li class="active">List Photos</li>
     </ul>
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="btn-toolbar">
-                <a href="add_magazine" class="btn btn-primary btn-sign-in"><i class="icon-plus"></i> Add Photos</a>
+                <a href="add_photo" class="btn btn-primary btn-sign-in"><i class="icon-plus"></i> Add Photos</a>
             </div>
             <div id="ctl00_cph_divWorkAreaContent" style="overflow: hidden;" ></div>
             <div id="tt" style="width:auto;height:0!important"
@@ -28,7 +28,7 @@
 
     function childserviceload() {
         $('#tt').datagrid({
-            url: 'photolist?type=2',
+            url: 'photolist',
             onLoadSuccess: checkchildserviceload
         });
     }
@@ -54,9 +54,9 @@
         window.location="edit_magazine?id="+id+"&ctid="+ctid;
     }
     function deletecontent(id, ctid) {
-        swal({title: "Are you sure?", text: "You want to delete this magazine!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
+        swal({title: "Are you sure?", text: "You want to delete this Photo!", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55", confirmButtonText: "Yes!", closeOnConfirm: false}, function () {
             $.ajax({
-                url: "delete_content_type?id=" + id + "&ctid=" + ctid,
+                url: "delete_photo?id=" + id,
                 type: "GET",
                 dataType: "json",
                 contentType: "application/json",
@@ -64,9 +64,9 @@
                 {
                     code = data.response.code;
                     if (code == 0) {
-                        swal({title: "Success", text: "Magazine Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
+                        swal({title: "Success", text: "Photo Deleted Successfully", imageUrl: "resources/images/thumbs-up.jpg"}, function (isConfirm) {
                             if (isConfirm) {
-                                window.location = 'list_magazine';
+                                window.location = 'photslist';
                             }
                         });
                     } else {
