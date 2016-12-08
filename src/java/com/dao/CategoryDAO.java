@@ -846,7 +846,7 @@ public class CategoryDAO {
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
-                       if (type.equalsIgnoreCase("2")) {
+                        if (type.equalsIgnoreCase("2")) {
                             property.put("faq_type", Utilities.nullToEmpty(rs.getString("book_type")));
                             property.put("file_path", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         } else {
@@ -1012,11 +1012,11 @@ public class CategoryDAO {
         return propertyArray;
     }
 
-    public JSONArray getContent(String type,String lang_type) {
+    public JSONArray getContent(String type, String lang_type) {
         String selectcat = ConfigUtil.getProperty("select.thoughts.query1", "SELECT * FROM content_type where type=" + type);
 
-        if(StringUtils.isNotBlank(lang_type)){
-            selectcat=selectcat+" and lang_type="+lang_type;
+        if (StringUtils.isNotBlank(lang_type)) {
+            selectcat = selectcat + " and lang_type=" + lang_type;
         }
         ResultSet rs = null;
         ResultSet rs1 = null;
@@ -1038,25 +1038,31 @@ public class CategoryDAO {
                     property.put(Constants.id, id);
                     property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     if (!(type.equalsIgnoreCase("3") || type.equalsIgnoreCase("4"))) {
-                        property.put("file_path", url+Utilities.nullToEmpty(rs.getString("file_path")));
+                        property.put("file_path", url + Utilities.nullToEmpty(rs.getString("file_path")));
                     }
                     if (type.equalsIgnoreCase("3") || type.equalsIgnoreCase("4")) {
                         property.put("lang_type", Utilities.nullToEmpty(rs.getString("lang_type")));
-                    }
-                    String selectcat1 = ConfigUtil.getProperty("select.thoughts.query1", "SELECT * FROM content_type_image where content_id=" + id);
-                    pstmt1 = objConn.prepareStatement(selectcat1);
-                    rs1 = pstmt1.executeQuery();
-                    while (rs1.next()) {
                         JSONObject propertyfile = new JSONObject();
-                        propertyfile.put("id", Utilities.nullToEmpty(rs1.getString("id")));
-                        if (type.equalsIgnoreCase("3") || type.equalsIgnoreCase("4")) {
-                            propertyfile.put("file_url", Utilities.nullToEmpty(rs1.getString("image")));
-                        } else {
-                            propertyfile.put("file_url", url + Utilities.nullToEmpty(rs1.getString("image")));
-                        }
-
+                        propertyfile.put("id", Utilities.nullToEmpty(rs.getString("id")));
+                        propertyfile.put("file_url", Utilities.nullToEmpty(rs.getString("link")));
                         fileArray.put(propertyfile);
+                    } else {
+                        String selectcat1 = ConfigUtil.getProperty("select.thoughts.query1", "SELECT * FROM content_type_image where content_id=" + id);
+                        pstmt1 = objConn.prepareStatement(selectcat1);
+                        rs1 = pstmt1.executeQuery();
+                        while (rs1.next()) {
+                            JSONObject propertyfile = new JSONObject();
+                            propertyfile.put("id", Utilities.nullToEmpty(rs1.getString("id")));
+                            if (type.equalsIgnoreCase("3") || type.equalsIgnoreCase("4")) {
+                                propertyfile.put("file_url", Utilities.nullToEmpty(rs1.getString("image")));
+                            } else {
+                                propertyfile.put("file_url", url + Utilities.nullToEmpty(rs1.getString("image")));
+                            }
+
+                            fileArray.put(propertyfile);
+                        }
                     }
+
                     property.put("files", fileArray);
                     propertyArray.put(property);
                 }
