@@ -43,7 +43,7 @@
             var selectedRow = $('#tt').datagrid('getRows')[i];
             htmocontent = htmocontent + '<tr>';
             htmocontent = htmocontent + '<td>' + selectedRow.id + '</td>';
-            htmocontent = htmocontent + '<td><a href="' + selectedRow.image + '" target="_blank" ><img src="resources/images/images.png" width="30" height="30"></a></td>';
+            htmocontent = htmocontent + '<td><a href="' + selectedRow.image + '" target="_blank" ><img src="'+selectedRow.image+'" width="30" height="30"></a></td>';
             htmocontent = htmocontent + '<td><a href="#" onclick="deletecontent(' + selectedRow.id  +', ' + selectedRow.ctid + ')">Delete</a></td>';
             htmocontent = htmocontent + '</tr>';
         }

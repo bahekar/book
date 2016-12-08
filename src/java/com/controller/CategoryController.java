@@ -388,7 +388,30 @@ public class CategoryController {
 //            JSONObject objRequest = new JSONObject();
 //            objRequest.put("code", "0");
 //            objRequest.put("description", "success");
-            strResult = objUserService.getbooks(language);
+            strResult = objUserService.getbooks(language,"1");
+//
+//            objRequest.put("bookslist", strResult);
+            return strResult.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
+
+     @RequestMapping(value = "/api/getfaq", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getfaq(@RequestParam(value = "language", required = false) String language, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONObject strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+//            JSONObject objRequest = new JSONObject();
+//            objRequest.put("code", "0");
+//            objRequest.put("description", "success");
+            strResult = objUserService.getbooks(language,"2");
 //
 //            objRequest.put("bookslist", strResult);
             return strResult.toString().getBytes("UTF-8");
@@ -449,7 +472,7 @@ public class CategoryController {
 
     @RequestMapping(value = "/api/getContent", method = RequestMethod.GET)
     public @ResponseBody
-    byte[] getContent(@RequestParam(value = "type", required = false) String type, HttpSession httpSession) throws UnsupportedEncodingException {
+    byte[] getContent(@RequestParam(value = "lang_type", required = false) String lang_type,@RequestParam(value = "type", required = false) String type, HttpSession httpSession) throws UnsupportedEncodingException {
         JSONArray strResult = null;
         String transId = UUID.randomUUID().toString();
 
@@ -457,7 +480,7 @@ public class CategoryController {
 //            JSONObject objRequest = new JSONObject();
 //            objRequest.put("code", "0");
 //            objRequest.put("description", "success");
-            strResult = objUserService.getContent(type);
+            strResult = objUserService.getContent(type,lang_type);
 
 //            objRequest.put("contentlist", strResult);
             System.out.println("svn test");
@@ -573,9 +596,9 @@ public class CategoryController {
         return strResponse;
     }
 
-    @RequestMapping(value = "/api/getfaq", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/getfaq1", method = RequestMethod.GET)
     public @ResponseBody
-    byte[] getfaq(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "mobile", required = false) String mobile, @RequestParam(value = "email", required = false) String email, HttpSession httpSession) throws UnsupportedEncodingException {
+    byte[] getfaq1(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "mobile", required = false) String mobile, @RequestParam(value = "email", required = false) String email, HttpSession httpSession) throws UnsupportedEncodingException {
         JSONArray strResult = null;
         String transId = UUID.randomUUID().toString();
 

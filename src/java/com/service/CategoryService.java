@@ -188,8 +188,8 @@ public class CategoryService {
         return objUserDAO.getsubcategory(id);
     }
 
-    public JSONObject getbooks(String language) {
-        return objUserDAO.getbooks(language);
+    public JSONObject getbooks(String language,String type) {
+        return objUserDAO.getbooks(language,type);
     }
 
     public String delete_rss_feed(String strTid, String id) {
@@ -301,8 +301,8 @@ public class CategoryService {
         return objUserDAO.getphotos();
     }
 
-    public JSONArray getContent(String type) {
-        return objUserDAO.getContent(type);
+    public JSONArray getContent(String type,String lang_type) {
+        return objUserDAO.getContent(type,lang_type);
     }
     
       public String addfaq(User user, String strTid) {
