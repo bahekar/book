@@ -624,4 +624,62 @@ public class CategoryController {
         }
     }
 
+      @RequestMapping(value = "/api/getmagazine", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getmagazine(@RequestParam(value = "language", required = false) String language, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONObject strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+
+            strResult = objUserService.getbooks(language,"3");
+            return strResult.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
+
+  @RequestMapping(value = "/api/getthoughts", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getthoughts(@RequestParam(value = "language", required = false) String language, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONObject strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+
+            strResult = objUserService.getbooks(language,"4");
+            return strResult.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
+
+  @RequestMapping(value = "/api/getshameferoza", method = RequestMethod.GET)
+    public @ResponseBody
+    byte[] getshameferoza(@RequestParam(value = "language", required = false) String language, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONObject strResult = null;
+        String transId = UUID.randomUUID().toString();
+
+        try {
+
+            strResult = objUserService.getbooks(language,"5");
+            return strResult.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
+
+
 }

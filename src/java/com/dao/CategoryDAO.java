@@ -832,13 +832,8 @@ public class CategoryDAO {
                         } else {
                             propertyArrayarra.put(property);
                         }
-                        if (type.equalsIgnoreCase("2")) {
-                            property.put("faq_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                            property.put("file_path", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                        } else {
-                            property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                            property.put("book_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                        }
+                        property.put("file_url",url + Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
 
                     } else if (language.equalsIgnoreCase("1")) {
                         property.put(Constants.id, rs.getString(Constants.id));
@@ -846,13 +841,9 @@ public class CategoryDAO {
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
-                        if (type.equalsIgnoreCase("2")) {
-                            property.put("faq_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                            property.put("file_path", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                        } else {
-                            property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                            property.put("book_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                        }
+                        property.put("file_url",url + Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
+
                         propertyArrayenglish.put(property);
                     } else if (language.equalsIgnoreCase("3")) {
                         property.put(Constants.id, rs.getString(Constants.id));
@@ -860,26 +851,16 @@ public class CategoryDAO {
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
-                        if (type.equalsIgnoreCase("2")) {
-                            property.put("faq_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                            property.put("file_path", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                        } else {
-                            property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                            property.put("book_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                        }
+                        property.put("file_url",url + Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
                         propertyArrayUrdu.put(property);
                     } else if (language.equalsIgnoreCase("2")) {
                         property.put(Constants.id, rs.getString(Constants.id));
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        if (type.equalsIgnoreCase("2")) {
-                            property.put("faq_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                            property.put("file_path", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                        } else {
-                            property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                            property.put("book_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                        }
+                        property.put("file_url", url +Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
                         propertyArrayhindi.put(property);
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     } else {
@@ -887,13 +868,8 @@ public class CategoryDAO {
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        if (type.equalsIgnoreCase("2")) {
-                            property.put("faq_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                            property.put("file_path", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                        } else {
-                            property.put("book_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
-                            property.put("book_type", Utilities.nullToEmpty(rs.getString("book_type")));
-                        }
+                        property.put("file_url", url +Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
                         propertyArrayarra.put(property);
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
                     }
