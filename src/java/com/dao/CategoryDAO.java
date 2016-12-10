@@ -891,7 +891,7 @@ public class CategoryDAO {
                 }
                 if (propertyArrayarra.length() > 0) {
                     // JSONObject urdu = new JSONObject();
-                    thoughts.put("arabic", propertyArrayUrdu);
+                    thoughts.put("arabic", propertyArrayarra);
                     // thoughts.put(urdu);
                 }
             }

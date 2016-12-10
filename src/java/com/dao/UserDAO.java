@@ -272,8 +272,8 @@ public class UserDAO {
         return propertyArray;
     }
 
-    public int get_single_upload_listCount(String strTid) throws SQLException, Exception {
-        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM book");
+    public int get_single_upload_listCount(String strTid,String type) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM book where type="+type);
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -1105,8 +1105,8 @@ public class UserDAO {
         return propertyArray;
     }
 
-    public int content_type_listCount(String strTid) throws SQLException, Exception {
-        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM content_type");
+    public int content_type_listCount(String strTid,String type) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM content_type where type="+type);
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;

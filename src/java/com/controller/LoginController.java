@@ -283,7 +283,7 @@ public class LoginController {
             }
             JSONObject json = new JSONObject();
             JSONArray obj = objUserService.get_single_upload_list(strTid, fromIndex, endIndex, type);
-            json.put("total", objUserService.get_single_upload_listCount(strTid));
+            json.put("total", objUserService.get_single_upload_listCount(strTid,type));
             json.put("page", page);
             json.put("records", obj.length());
             json.put("rows", obj);
@@ -682,7 +682,7 @@ public class LoginController {
             }
             JSONObject json = new JSONObject();
             JSONArray obj = objUserService.audio_video_list(strTid, fromIndex, endIndex, type);
-            json.put("total", objUserService.content_type_listCount(strTid));
+            json.put("total", objUserService.content_type_listCount(strTid,type));
             json.put("page", page);
             json.put("records", obj.length());
             json.put("rows", obj);
@@ -707,7 +707,7 @@ public class LoginController {
             }
             JSONObject json = new JSONObject();
             JSONArray obj = objUserService.content_type_list(strTid, fromIndex, endIndex, type);
-            json.put("total", objUserService.content_type_listCount(strTid));
+            json.put("total", objUserService.content_type_listCount(strTid,type));
             json.put("page", page);
             json.put("records", obj.length());
             json.put("rows", obj);

@@ -109,8 +109,8 @@ public class UserService {
         return objUserDAO.edit_rss_content(id);
     }
    
-    public int get_single_upload_listCount(String transId) throws SQLException, Exception {
-        return objUserDAO.get_single_upload_listCount(transId);
+    public int get_single_upload_listCount(String transId,String type) throws SQLException, Exception {
+        return objUserDAO.get_single_upload_listCount(transId,type);
     }
 
     public JSONArray get_single_upload_list(String transId, int fromIndex, int endIndex, String type) throws SQLException, Exception {
@@ -337,8 +337,8 @@ public class UserService {
         }
     }
     
-    public int content_type_listCount(String transId) throws SQLException, Exception {
-        return objUserDAO.content_type_listCount(transId);
+    public int content_type_listCount(String transId,String type) throws SQLException, Exception {
+        return objUserDAO.content_type_listCount(transId,type);
     }
 
     public JSONArray content_type_list(String transId, int fromIndex, int endIndex, String type) throws SQLException, Exception {
