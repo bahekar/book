@@ -23,7 +23,7 @@ public class ResponseCodes {
         INVALID_PASSWORD(105, "Password must not be Empty"),
         INVALID_JSON(106, "Invalid JSON"),
         UMP_INVALID_STATE(107, "Invalid State"),
-        USERID_NOT_EXISTS(108, "UserId not exists"),
+        USERID_NOT_EXISTS(108, "User not exists"),
         WRONG_PASSWORD(109, "Invalid password"),
         INVALID_LOGIN_TYPEID(110, "Invalid login typeid"),
         INVALID_SMTP_CONNECTION(111, "Invalid smtp connection"),
@@ -63,6 +63,8 @@ public class ResponseCodes {
         SUFFICIENT_CREDITS(144, "User not have sufficient credits."),
         INVALID_PRICE(145, "Invalid Price"),
         INVALID_COUPON(146, "Invalid Coupon"),
+        Confirm_PASSWORD(148, "Confirm must not be Empty"),
+         Password_Confirm_PASSWORD(150, "Password and Confirm not Matching"),
         INVALID_RESTAURANT(147, "Invalid Restaurant");
         
         private final int CODE;

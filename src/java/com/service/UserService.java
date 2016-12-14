@@ -9,13 +9,17 @@ import com.beans.Addzonedish;
 import com.beans.Content;
 import com.beans.Coupon;
 import com.beans.DealBean;
+import com.beans.LoginRequestBean;
 import com.beans.User;
+import com.beans.UserPasswordBean;
 import com.common.ResponseCodes;
 import static com.common.ResponseCodes.ServiceErrorCodes.GENERIC_ERROR;
 import static com.common.ResponseCodes.ServiceErrorCodes.SUCCESS;
 import static com.common.ResponseCodes.ServiceErrorCodes.FAV_FAILED;
+import static com.common.ResponseCodes.ServiceErrorCodes.GENERIC_ERROR;
 import static com.common.ResponseCodes.ServiceErrorCodes.INFAV_FAILED;
 import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_DATA;
+import static com.common.ResponseCodes.ServiceErrorCodes.SUCCESS;
 import com.common.RestBean;
 import com.common.Utilities;
 
@@ -442,5 +446,55 @@ public class UserService {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
+     public String addUserDetails(User user, String strTid) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        try {
+
+            isUpdated = objUserDAO.addUserDetails(user);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponsetoken(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            }
+
+        } catch (SQLException sqle) {
+            if (sqle.getMessage().contains("idx_userid_uq")) {
+                errorCode = ResponseCodes.ServiceErrorCodes.USERID_ALREADY_EXISTS;
+            } else if (sqle.getMessage().contains("idx_loginid_uq")) {
+                errorCode = ResponseCodes.ServiceErrorCodes.USERID_ALREADY_EXISTS;
+            }
+            try {
+                nUserID = getUserId(user.getUser_id(), strTid);
+            } catch (Exception e) {
+            }
+            logger.error(" Got SQLException " + Utilities.getStackTrace(sqle));
+            return Utilities.prepareReponsetoken(errorCode.getCode() + "", errorCode.DESC(), strTid, nUserID);
+
+        } catch (Exception e) {
+            logger.error("Exception in addUserDetails(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+
+    public int getUserId(String userId, String transId) throws SQLException, Exception {
+        return objUserDAO.getUserID(userId, transId);
+    }
     
+      public String signIn(LoginRequestBean reqBean, String strTid) {
+        int isUpdated = 0;
+        try {
+            return objUserDAO.loginDetails(reqBean, strTid);
+        } catch (SQLException sqle) {
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        } catch (Exception e) {
+            logger.error("Exception in addUserDetails(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+   public String passwordService(UserPasswordBean userPasswordBean, String transId) throws SQLException, Exception {
+        return objUserDAO.passwordService(userPasswordBean, transId);
+    }
+
 }

@@ -19,6 +19,7 @@ public class User {
     private String mobile;
     private String question;
     private String password;
+    private String confirmpassword;
     private String fullname;
 
     private String errorMessage;
@@ -141,6 +142,20 @@ public class User {
      */
     public void setQuestion(String question) {
         this.question = question;
+    }
+
+    /**
+     * @return the confirmpassword
+     */
+    public String getConfirmpassword() {
+        return confirmpassword;
+    }
+
+    /**
+     * @param confirmpassword the confirmpassword to set
+     */
+    public void setConfirmpassword(String confirmpassword) {
+        this.confirmpassword = confirmpassword;
     }
 
 }

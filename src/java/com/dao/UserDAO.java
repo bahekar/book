@@ -9,12 +9,15 @@ import com.beans.Addzonedish;
 import com.beans.Content;
 import com.beans.Coupon;
 import com.beans.DealBean;
+import com.beans.LoginRequestBean;
 import com.beans.User;
+import com.beans.UserPasswordBean;
 import com.common.AESAlgo;
 import com.common.ConfigUtil;
 import com.common.Constants;
 import com.common.DBConnection;
 import com.common.HttpDispatchClient;
+import com.common.Mailer;
 import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_USER_DETAILS;
 import static com.common.ResponseCodes.ServiceErrorCodes.SUCCESS;
 import static com.common.ResponseCodes.ServiceErrorCodes.USERID_NOT_EXISTS;
@@ -23,9 +26,13 @@ import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_DEAL_CODE;
 import static com.common.ResponseCodes.ServiceErrorCodes.SUFFICIENT_CREDITS;
 import static com.common.ResponseCodes.ServiceErrorCodes.GENERIC_ERROR;
 import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_COUPON;
+import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_FORGOT_PASSWORD_TOKEN;
 import static com.common.ResponseCodes.ServiceErrorCodes.INVALID_USER_DETAILS;
+import static com.common.ResponseCodes.ServiceErrorCodes.OLDPASSWORD_IS_WRONG;
+import static com.common.ResponseCodes.ServiceErrorCodes.PASSWORD_UPDATE_FAILED;
 import static com.common.ResponseCodes.ServiceErrorCodes.SUCCESS;
 import static com.common.ResponseCodes.ServiceErrorCodes.USERID_NOT_EXISTS;
+import static com.common.ResponseCodes.ServiceErrorCodes.USER_INACTIVE;
 import static com.common.ResponseCodes.ServiceErrorCodes.WRONG_PASSWORD;
 import com.common.RestBean;
 import com.common.RestImages;
@@ -42,6 +49,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,12 +66,30 @@ public class UserDAO {
     DBConnection dbconnection = null;
     String url = "";
     public static final double oneSquareMeter = Double.valueOf(ConfigUtil.getProperty("one.square.meter", "0.092903"));
+    String forgotPWDMailContent = "";
+    Mailer objMail = null;
+    String mailFrom = "";
+    String mailCC = "";
+    String mailBCC = "";
+    String mailSubjectForForgotPwd = "";
+    String mailSubjectRequestInfo = "";
 
     public UserDAO() {
         dbconnection = DBConnection.getInstance();
         url = ConfigUtil.getProperty("url", "http://35.154.44.42:8080/bookmanagement");
 //        url = "http://localhost:8080/menubook";
         HttpDispatchClient.getInstance();
+        objMail = new Mailer(ConfigUtil.getProperties());
+        mailFrom = ConfigUtil.getProperty("smtp.mail.from", "info@bookmanagement.net");
+        mailCC = ConfigUtil.getProperty("smtp.mail.cc", "chhavibahekar@gmail.com");
+        mailBCC = ConfigUtil.getProperty("smtp.mail.bcc", "chhavibahekar@gmail.com");
+        mailSubjectForForgotPwd = ConfigUtil.getProperty("smtp.mail.subject", "Your new bookmanagement password");
+        mailSubjectRequestInfo = ConfigUtil.getProperty("smtp.mail.subject.requestinfo", "Request Info For a Property");
+
+        forgotPWDMailContent = ConfigUtil.getProperty("mail.forgotpwd.content", "forgot password content");
+
+        forgotPWDMailContent = ConfigUtil.getProperty("mail.forgotpwd.content", "forgot password content");
+        objMail = new Mailer(ConfigUtil.getProperties());
     }
     static Log logger = LogFactory.getLog(UserDAO.class);
 
@@ -116,13 +143,13 @@ public class UserDAO {
 
                 if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
                     pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
-                }else if (StringUtils.isNotBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
+                } else if (StringUtils.isNotBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
                     updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `title`=?,`published_date`=?,`author_name`=?,`book_type`=?,`file_path`=? where id=? ");
                     pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
-                }else if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isNotBlank(objContent.getContent_file())) {
+                } else if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isNotBlank(objContent.getContent_file())) {
                     updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `title`=?,`published_date`=?,`author_name`=?,`book_type`=?,`book_url`=? where id=? ");
                     pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
-                }else {
+                } else {
                     updateQuery = ConfigUtil.getProperty("store.book.query", "UPDATE `adminbook`.`book` SET `title`=?,`published_date`=?,`author_name`=?,`book_type`=?,`file_path`=?,`book_url`=? where id=? ");
                     pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
                 }
@@ -131,16 +158,16 @@ public class UserDAO {
                 pstmt.setString(2, objContent.getPublished_date());
                 pstmt.setString(3, objContent.getAuthor_name());
                 pstmt.setString(4, objContent.getBook_type());
-                
+
                 if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
                     pstmt.setString(5, objContent.getId());
-                }else if (StringUtils.isNotBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
+                } else if (StringUtils.isNotBlank(objContent.getFilePath()) && StringUtils.isBlank(objContent.getContent_file())) {
                     pstmt.setString(5, objContent.getFilePath());
                     pstmt.setString(6, objContent.getId());
-                }else if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isNotBlank(objContent.getContent_file())) {
+                } else if (StringUtils.isBlank(objContent.getFilePath()) && StringUtils.isNotBlank(objContent.getContent_file())) {
                     pstmt.setString(5, objContent.getContent_file());
                     pstmt.setString(6, objContent.getId());
-                }else {
+                } else {
                     pstmt.setString(5, objContent.getFilePath());
                     pstmt.setString(6, objContent.getContent_file());
                     pstmt.setString(7, objContent.getId());
@@ -165,7 +192,7 @@ public class UserDAO {
         }
         return -1;
     }
-    
+
     public int addphoto(Content objContent) {
         String insertQuery = ConfigUtil.getProperty("addphoto", "INSERT INTO `adminbook`.`photos`(`image`) VALUES (?)");
         ResultSet rs = null;
@@ -178,7 +205,7 @@ public class UserDAO {
                 pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
 
                 pstmt.setString(1, objContent.getFilePath());
-                
+
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
@@ -272,8 +299,8 @@ public class UserDAO {
         return propertyArray;
     }
 
-    public int get_single_upload_listCount(String strTid,String type) throws SQLException, Exception {
-        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM book where type="+type);
+    public int get_single_upload_listCount(String strTid, String type) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM book where type=" + type);
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -335,6 +362,7 @@ public class UserDAO {
         }
         return status;
     }
+
     public int delete_photo(String id) throws SQLException, Exception {
         String delete_single_upload = ConfigUtil.getProperty("delete_photo", "DELETE FROM `photos` WHERE id=?");
         ResultSet rs = null;
@@ -952,11 +980,11 @@ public class UserDAO {
         }
         return neighborhoodObj;
     }
-    
+
     public int addcontenttype(Content objContent) {
         String insertQuery = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type`(`title`,`type`) VALUES (?,?)");
         String insertQuery2 = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type_image`(`image`,`content_id`) VALUES (?,?)");
-        
+
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -968,7 +996,7 @@ public class UserDAO {
 
                 pstmt.setString(1, objContent.getTitle());
                 pstmt.setString(2, objContent.getType());
-               
+
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
@@ -994,10 +1022,10 @@ public class UserDAO {
         }
         return -1;
     }
-    
+
     public int addaudiovideotype(Content objContent) {
         String insertQuery = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type`(`title`,`type`,`link`,`lang_type`) VALUES (?,?,?,?)");
-        
+
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -1031,9 +1059,9 @@ public class UserDAO {
         }
         return -1;
     }
-    
+
     public JSONArray audio_video_list(String strTid, int fromIndex, int endIndex, String type) throws SQLException, Exception {
-        String query = ConfigUtil.getProperty("query", "SELECT * from content_type where type = "+type+" order by title asc LIMIT " + fromIndex + "," + endIndex + "");
+        String query = ConfigUtil.getProperty("query", "SELECT * from content_type where type = " + type + " order by title asc LIMIT " + fromIndex + "," + endIndex + "");
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -1067,9 +1095,9 @@ public class UserDAO {
         }
         return propertyArray;
     }
-    
+
     public JSONArray content_type_list(String strTid, int fromIndex, int endIndex, String type) throws SQLException, Exception {
-        String query = ConfigUtil.getProperty("query", "SELECT ct.id as id, cti.id as ctid, ct.title as title, cti.image as image FROM content_type as ct, content_type_image as cti where ct.id = cti.content_id and ct.type = "+type+" order by ct.title asc LIMIT " + fromIndex + "," + endIndex + "");
+        String query = ConfigUtil.getProperty("query", "SELECT ct.id as id, cti.id as ctid, ct.title as title, cti.image as image FROM content_type as ct, content_type_image as cti where ct.id = cti.content_id and ct.type = " + type + " order by ct.title asc LIMIT " + fromIndex + "," + endIndex + "");
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -1105,8 +1133,8 @@ public class UserDAO {
         return propertyArray;
     }
 
-    public int content_type_listCount(String strTid,String type) throws SQLException, Exception {
-        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM content_type where type="+type);
+    public int content_type_listCount(String strTid, String type) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM content_type where type=" + type);
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -1135,12 +1163,12 @@ public class UserDAO {
         }
         return count;
     }
-    
+
     public int delete_content_type(String id, String ctid) throws SQLException, Exception {
-        
+
         String delete_content_type = ConfigUtil.getProperty("delete_content_type", "DELETE FROM `content_type` WHERE id=?");
         String delete_content_type2 = ConfigUtil.getProperty("delete_content_type", "DELETE FROM `content_type_image` WHERE id=?");
-        
+
         ResultSet rs = null;
         PreparedStatement pstmt = null;
 
@@ -1152,7 +1180,7 @@ public class UserDAO {
                 pstmt = objConn.prepareStatement(delete_content_type);
                 pstmt.setString(1, id);
                 status = pstmt.executeUpdate();
-                
+
                 pstmt = objConn.prepareStatement(delete_content_type2);
                 pstmt.setString(1, ctid);
                 status = pstmt.executeUpdate();
@@ -1175,11 +1203,11 @@ public class UserDAO {
         }
         return status;
     }
-    
+
     public int delete_audio_video(String id) throws SQLException, Exception {
-        
+
         String delete_audio_video = ConfigUtil.getProperty("delete_audio_video", "DELETE FROM `content_type` WHERE id=?");
-        
+
         ResultSet rs = null;
         PreparedStatement pstmt = null;
 
@@ -1191,7 +1219,7 @@ public class UserDAO {
                 pstmt = objConn.prepareStatement(delete_audio_video);
                 pstmt.setString(1, id);
                 status = pstmt.executeUpdate();
-                
+
                 logger.debug("no of res deletetd is :" + status);
 
             } else {
@@ -1210,7 +1238,7 @@ public class UserDAO {
         }
         return status;
     }
-    
+
     public JSONObject edit_magazine(String id, String ctid) {
         JSONObject neighborhoodObj = new JSONObject();
         String single_details = ConfigUtil.getProperty("details", "SELECT ct.id as id, cti.id as ctid, ct.title as title, cti.image as image FROM content_type as ct, content_type_image as cti where ct.id = " + id + " AND cti.id = " + ctid);
@@ -1243,7 +1271,7 @@ public class UserDAO {
         }
         return neighborhoodObj;
     }
-    
+
     public JSONObject edit_audio_video_view(String id) {
         JSONObject neighborhoodObj = new JSONObject();
         String single_details = ConfigUtil.getProperty("details", "SELECT * from content_type where id = " + id);
@@ -1276,7 +1304,7 @@ public class UserDAO {
         }
         return neighborhoodObj;
     }
-    
+
     public int editcontenttype(Content objContent) {
         String updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type` SET `title`=? where id=? ");
         ResultSet rs = null;
@@ -1292,11 +1320,11 @@ public class UserDAO {
                 } else {
                     updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type` SET `title`=? where id=? ");
                     pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
-                   
+
                 }
                 pstmt.setString(1, objContent.getTitle());
                 pstmt.setString(2, objContent.getCid());
-              
+
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
@@ -1310,7 +1338,7 @@ public class UserDAO {
                     pstmt1 = objConn.prepareStatement(updateQuery2, Statement.RETURN_GENERATED_KEYS);
                     nRes = pstmt1.executeUpdate();
                 }
-                
+
                 return nRes;
             }
         } catch (SQLException sqle) {
@@ -1326,7 +1354,7 @@ public class UserDAO {
         }
         return -1;
     }
-    
+
     public int editaudiovideo(Content objContent) {
         String updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`content_type` SET `title`=?, link=?, lang_type=? where id=? ");
         ResultSet rs = null;
@@ -1337,17 +1365,17 @@ public class UserDAO {
             objConn = DBConnection.getInstance().getConnection();
             if (objConn != null) {
                 pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
-                
+
                 pstmt.setString(1, objContent.getTitle());
                 pstmt.setString(2, objContent.getLink());
                 pstmt.setString(3, objContent.getBook_type());
                 pstmt.setString(4, objContent.getCid());
-              
+
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
                     nRes = rs.getInt(1);
-                }                
+                }
                 return nRes;
             }
         } catch (SQLException sqle) {
@@ -1363,11 +1391,11 @@ public class UserDAO {
         }
         return -1;
     }
-    
+
     public int addthoughts(Content objContent) {
         String insertQuery = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type`(`title`,`type`) VALUES (?,?)");
         String insertQuery2 = ConfigUtil.getProperty("query", "INSERT INTO `adminbook`.`content_type_image`(`image`,`content_id`) VALUES (?,?)");
-        
+
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -1379,7 +1407,7 @@ public class UserDAO {
 
                 pstmt.setString(1, objContent.getTitle());
                 pstmt.setString(2, objContent.getType());
-               
+
                 int nRes = pstmt.executeUpdate();
                 rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
@@ -1405,8 +1433,8 @@ public class UserDAO {
         }
         return -1;
     }
-    
-       public JSONArray photolist_list(String strTid, int fromIndex, int endIndex) throws SQLException, Exception {
+
+    public JSONArray photolist_list(String strTid, int fromIndex, int endIndex) throws SQLException, Exception {
         String query = ConfigUtil.getProperty("query", "SELECT * FROM photos order by id desc LIMIT " + fromIndex + "," + endIndex + "");
 
         ResultSet rs = null;
@@ -1470,6 +1498,268 @@ public class UserDAO {
             }
         }
         return count;
+    }
+
+    public int addUserDetails(User user) throws SQLException, Exception {
+        String insertQuery = ConfigUtil.getProperty("store.user.data.query", "INSERT INTO `users`(`user_id`,`password`,`fullname`,`mobile`) VALUES (?,?,?,?)");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+
+        Connection objConn = null;
+        int status = 0;
+        try {
+            objConn = dbconnection.getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, user.getEmail());
+                if (StringUtils.isNotBlank(user.getPassword())) {
+                    pstmt.setString(2, AESAlgo.encrypt(user.getPassword()));
+                } else {
+                    pstmt.setString(2, user.getPassword());
+                }
+
+                pstmt.setString(3, user.getName());
+                pstmt.setString(4, user.getMobile());
+
+                status = pstmt.executeUpdate();
+
+            } else {
+                logger.error("addUserDetails(): connection object is null");
+            }
+        } catch (SQLException sqle) {
+            logger.error("addUserDetails() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("addUserDetails() Got Exception : " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return status;
+    }
+
+    public int getUserID(String userId, String transId) {
+        String userQuery = ConfigUtil.getProperty("user.query", "select * from users where user_id=?");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(userQuery);
+                pstmt.setString(1, userId);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while updating the get userId" + Utilities.getStackTrace(sqle));
+        } catch (Exception e) {
+            logger.error(" Got Exception while updating the get userId" + Utilities.getStackTrace(e));
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
+
+    public String loginDetails(LoginRequestBean loginRequestBean, String strTransId) throws SQLException, Exception {
+        String selectQuery = ConfigUtil.getProperty("user.login.query", "select * from users where mobile=?");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(selectQuery);
+                String password = AESAlgo.encrypt(loginRequestBean.getPassword());
+                pstmt.setString(1, loginRequestBean.getMobile());
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    String pwd = rs.getString("password");
+                    if (!pwd.equals(password)) {
+                        return Utilities.prepareReponse(WRONG_PASSWORD.getCode(), WRONG_PASSWORD.DESC(), strTransId);
+                    }
+                    return Utilities.prepareReponsetoken(SUCCESS.getCode(), SUCCESS.DESC(), strTransId, rs.getInt("id"));
+                } else {
+                    return Utilities.prepareReponse(USERID_NOT_EXISTS.getCode(), USERID_NOT_EXISTS.DESC(), strTransId);
+                }
+            }
+
+        } catch (SQLException sqle) {
+            logger.error("addUserDetails() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("addUserDetails() : Got SQLException " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return Utilities.prepareReponse(INVALID_USER_DETAILS.getCode(), INVALID_USER_DETAILS.DESC(), "");
+    }
+
+    public String passwordService(UserPasswordBean userPasswordBean, String transId) throws SQLException, Exception {
+        String tokenQuery = ConfigUtil.getProperty("user.password.token", "select * from users where user_id=?");
+        String forgotQuery = ConfigUtil.getProperty("user.password.forgot.query", "select * from users where forgot_password_token=?");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+//                if (userPasswordBean.getType().equalsIgnoreCase("forgot")) {
+//                    pstmt = objConn.prepareStatement(forgotQuery);
+//                    pstmt.setString(1, userPasswordBean.getToken().trim());
+//                } else {
+//                    pstmt = objConn.prepareStatement(tokenQuery);
+//                    pstmt.setString(1, userPasswordBean.getUserId().trim());
+//
+//                }
+                if (StringUtils.isNotBlank(userPasswordBean.getEmail())) {
+                    pstmt = objConn.prepareStatement(tokenQuery);
+                    pstmt.setString(1, userPasswordBean.getEmail().trim());
+                } else {
+                    tokenQuery = ConfigUtil.getProperty("user.password.token", "select * from users where mobile=?");
+
+                    pstmt = objConn.prepareStatement(tokenQuery);
+                    pstmt.setString(1, userPasswordBean.getEmail().trim());
+                }
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                  //  int status = rs.getInt("status");
+                    String email = rs.getString("user_id");
+                   // String forgotPasswordToken = rs.getString("forgot_password_token");
+//                    if (status == Constants.USER_INACTIVE) {
+//                        return Utilities.prepareReponse(USER_INACTIVE.getCode(), USER_INACTIVE.DESC(), transId);
+//                    }
+                    if (userPasswordBean.getType().equalsIgnoreCase("token")) {
+                        String forgotToken = UUID.randomUUID().toString();
+                        String tempPwd = Utilities.generateRandomString();
+                       // int nRes = updateToken(tempPwd, userPasswordBean.getUserId());
+                        String pwdMailContent = forgotPWDMailContent;
+                         String newPassword = AESAlgo.encrypt(rs.getString("password"));
+                      //  if (nRes == Constants.INSERT_RECORD_SUCCESSFULLY) {
+                            pwdMailContent = pwdMailContent.replaceAll("\\$\\(newPassword\\)", newPassword);
+                            pwdMailContent = pwdMailContent.replaceAll("\\$\\(userId\\)", email);
+                            pwdMailContent = pwdMailContent.replaceAll("hostURL", url);
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Mail sending to user => " + email);
+                            }
+                       //  int   nRes = objMail.sendHtmlMail(mailFrom, email, mailCC, mailBCC, mailSubjectForForgotPwd, pwdMailContent, new ArrayList());
+                       // }
+                          int   nRes =1;
+                            return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), transId);
+                    }
+//                    
+//                    else if (userPasswordBean.getType().equalsIgnoreCase("forgot")) {
+//                        String token = userPasswordBean.getToken();
+//                        if (StringUtils.isBlank(token) || !token.trim().equalsIgnoreCase(forgotPasswordToken)) {
+//                            return Utilities.prepareReponse(INVALID_FORGOT_PASSWORD_TOKEN.getCode(), INVALID_FORGOT_PASSWORD_TOKEN.DESC(), transId);
+//                        }
+//                        String password = AESAlgo.encrypt(userPasswordBean.getNewpwd());
+//                        int nRes = updatePassword(password, rs.getString("user_id"));
+//                        if (nRes == Constants.UPDATED_RECORD_SUCCESSFULLY) {
+//                            return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), transId);
+//                        } else {
+//                            return Utilities.prepareReponse(PASSWORD_UPDATE_FAILED.getCode(), PASSWORD_UPDATE_FAILED.DESC(), transId);
+//                        }
+                    else if (userPasswordBean.getType().equalsIgnoreCase("change")) {
+                        String oldPassword = AESAlgo.encrypt(userPasswordBean.getOldpwd().trim());
+
+                        if (!oldPassword.equalsIgnoreCase(rs.getString("password"))) {
+                            return Utilities.prepareReponse(OLDPASSWORD_IS_WRONG.getCode(), OLDPASSWORD_IS_WRONG.DESC(), transId);
+                        }
+
+                        String newPassword = AESAlgo.encrypt(userPasswordBean.getNewpwd());
+                        int nRes = updatePassword(newPassword, userPasswordBean.getEmail());
+                        if (nRes == Constants.UPDATED_RECORD_SUCCESSFULLY) {
+                            return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), transId);
+                        } else {
+                            return Utilities.prepareReponse(PASSWORD_UPDATE_FAILED.getCode(), PASSWORD_UPDATE_FAILED.DESC(), transId);
+                        }
+                    }
+                    return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), transId);
+                } else {
+//                    if (userPasswordBean.getType().equalsIgnoreCase("forgot")) {
+//                        return Utilities.prepareReponse(USERID_NOT_EXISTS.getCode(), USERID_NOT_EXISTS.DESC(), transId);
+//                    } else {
+                        return Utilities.prepareReponse(USERID_NOT_EXISTS.getCode(), USERID_NOT_EXISTS.DESC(), transId);
+//                    }
+                }
+            }
+
+        } catch (SQLException sqle) {
+            logger.error("passwordService() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("passwordService() : Got SQLException " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return Utilities.prepareReponse(INVALID_USER_DETAILS.getCode(), INVALID_USER_DETAILS.DESC(), "");
+    }
+
+    public int updateToken(String pwd, String userId) {
+        String tokenQuery = ConfigUtil.getProperty("user.password.update.token.query", "update users set password=? where user_id=?");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(tokenQuery);
+                pwd = AESAlgo.encrypt(pwd);
+                pstmt.setString(1, pwd);
+                pstmt.setString(2, userId);
+                return pstmt.executeUpdate();
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while updating the forgot password token" + Utilities.getStackTrace(sqle));
+        } catch (Exception e) {
+            logger.error(" Got Exception while updating the forgot password token" + Utilities.getStackTrace(e));
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
+
+    public int updatePassword(String password, String userId) {
+        String tokenQuery = ConfigUtil.getProperty("user.password.update.query", "update users set password=? where user_id=?");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(tokenQuery);
+                pstmt.setString(1, password);
+                pstmt.setString(2, userId);
+                return pstmt.executeUpdate();
+            }
+        } catch (SQLException sqle) {
+            logger.error("[updatePassword] Got SQLException while updating the forgot password token" + Utilities.getStackTrace(sqle));
+        } catch (Exception e) {
+            logger.error("[updatePassword] Got Exception while updating the forgot password token" + Utilities.getStackTrace(e));
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+
+        return -1;
     }
 
 }

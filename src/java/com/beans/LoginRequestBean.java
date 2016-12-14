@@ -14,7 +14,7 @@ public class LoginRequestBean {
     private String userId;
     private String password;
     private int logintype;
-
+private String mobile;
     public String getUserId() {
         return userId;
     }
@@ -29,6 +29,20 @@ public class LoginRequestBean {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * @return the mobile
+     */
+    public String getMobile() {
+        return mobile;
+    }
+
+    /**
+     * @param mobile the mobile to set
+     */
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
     
 }

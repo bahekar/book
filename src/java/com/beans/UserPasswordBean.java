@@ -10,12 +10,15 @@ package com.beans;
  * @author pavankumar.g
  */
 public class UserPasswordBean {
-    
+
     private String type;
     private String userId;
+    private String email;
+    private String mobile;
     private String oldpwd;
     private String newpwd;
     private String token;
+    private String confirmpassword;
 
     public String getType() {
         return type;
@@ -56,5 +59,47 @@ public class UserPasswordBean {
     public void setToken(String token) {
         this.token = token;
     }
-    
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * @return the mobile
+     */
+    public String getMobile() {
+        return mobile;
+    }
+
+    /**
+     * @param mobile the mobile to set
+     */
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    /**
+     * @return the confirmpassword
+     */
+    public String getConfirmpassword() {
+        return confirmpassword;
+    }
+
+    /**
+     * @param confirmpassword the confirmpassword to set
+     */
+    public void setConfirmpassword(String confirmpassword) {
+        this.confirmpassword = confirmpassword;
+    }
+
 }
