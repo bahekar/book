@@ -12,18 +12,18 @@ package com.beans;
 public class User {
 
     private String id;
-
     private String user_id;
-    private String email;
+  
     private String name;
     private String mobile;
-    private String question;
     private String password;
     private String confirmpassword;
     private String fullname;
 
     private String errorMessage;
-
+    private String email;
+    private String question;
+    private String previousquestionid;
     /**
      * @return the user_id
      */
@@ -156,6 +156,20 @@ public class User {
      */
     public void setConfirmpassword(String confirmpassword) {
         this.confirmpassword = confirmpassword;
+    }
+
+    /**
+     * @return the previousquestionid
+     */
+    public String getPreviousquestionid() {
+        return previousquestionid;
+    }
+
+    /**
+     * @param previousquestionid the previousquestionid to set
+     */
+    public void setPreviousquestionid(String previousquestionid) {
+        this.previousquestionid = previousquestionid;
     }
 
 }

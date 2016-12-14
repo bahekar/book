@@ -324,4 +324,24 @@ public class CategoryService {
     public JSONArray getFAQ(User user) {
         return objUserDAO.getFAQ(user);
     }
+    
+      public String deletefaq(String id, String strTid) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        try {
+
+            isUpdated = objUserDAO.deletefaq(id);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponsetoken(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in delete_category(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
+
 }

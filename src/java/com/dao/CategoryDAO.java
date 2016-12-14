@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -832,7 +833,7 @@ public class CategoryDAO {
                         } else {
                             propertyArrayarra.put(property);
                         }
-                        property.put("file_url",url + Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("file_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
 
                     } else if (language.equalsIgnoreCase("1")) {
@@ -841,7 +842,7 @@ public class CategoryDAO {
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
-                        property.put("file_url",url + Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("file_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
 
                         propertyArrayenglish.put(property);
@@ -851,7 +852,7 @@ public class CategoryDAO {
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
-                        property.put("file_url",url + Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("file_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
                         propertyArrayUrdu.put(property);
                     } else if (language.equalsIgnoreCase("2")) {
@@ -859,7 +860,7 @@ public class CategoryDAO {
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        property.put("file_url", url +Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("file_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
                         propertyArrayhindi.put(property);
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
@@ -868,7 +869,7 @@ public class CategoryDAO {
                         property.put("author_name", Utilities.nullToEmpty(rs.getString("author_name")));
                         property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
                         property.put("image", url + Utilities.nullToEmpty(rs.getString("file_path")));
-                        property.put("file_url", url +Utilities.nullToEmpty(rs.getString("book_url")));
+                        property.put("file_url", url + Utilities.nullToEmpty(rs.getString("book_url")));
                         property.put("lang_type", Utilities.nullToEmpty(rs.getString("book_type")));
                         propertyArrayarra.put(property);
                         property.put("title", Utilities.nullToEmpty(rs.getString("title")));
@@ -1061,7 +1062,7 @@ public class CategoryDAO {
     }
 
     public int addfaq(User user) throws SQLException, Exception {
-        String insertQuery = ConfigUtil.getProperty("store.faq.data.query", "INSERT INTO `adminbook`.`faq`(`name`,`email`,`msisdn`,`question`) VALUES (?,?,?,?)");
+        String insertQuery = ConfigUtil.getProperty("store.faq.data.query", "INSERT INTO `adminbook`.`faq`(`email`,`question`) VALUES (?,?)");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
 
@@ -1070,11 +1071,18 @@ public class CategoryDAO {
         try {
             objConn = dbconnection.getConnection();
             if (objConn != null) {
-                pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
-                pstmt.setString(1, user.getName());
-                pstmt.setString(2, user.getEmail());
-                pstmt.setString(3, user.getMobile());
-                pstmt.setString(4, user.getQuestion());
+
+                if (StringUtils.isBlank(user.getPreviousquestionid())) {
+                    pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+                    pstmt.setString(1, user.getEmail());
+                    pstmt.setString(2, user.getQuestion());
+                } else {
+                    insertQuery = ConfigUtil.getProperty("store.faq.data.query", "INSERT INTO `adminbook`.`faq`(`email`,`question`,`counter_q_id`) VALUES (?,?,?)");
+                    pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+                    pstmt.setString(1, user.getEmail());
+                    pstmt.setString(2, user.getQuestion());
+                    pstmt.setString(3, user.getPreviousquestionid());
+                }
                 status = pstmt.executeUpdate();
             } else {
                 logger.error("addUserDetails(): connection object is null");
@@ -1095,7 +1103,7 @@ public class CategoryDAO {
 
     public JSONArray getFAQ(User user) {
         String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM faq");
-        selectcat = selectcat + " where name='" + user.getName() + "' and email='" + user.getEmail() + "' and msisdn='" + user.getMobile() + "'";
+        selectcat = selectcat + " where email='" + user.getEmail() + "' and counter_q_id IS null";
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -1108,11 +1116,16 @@ public class CategoryDAO {
                 pstmt = objConn.prepareStatement(selectcat);
                 rs = pstmt.executeQuery();
                 while (rs.next()) {
+                    String q_id = Utilities.nullToEmpty(rs.getString(Constants.id));
                     JSONObject property = new JSONObject();
-                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put(Constants.id, q_id);
                     property.put("question", Utilities.nullToEmpty(rs.getString("question")));
                     property.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
                     property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                    JSONObject objRes = addCounterQ(objConn, q_id);
+                    if (objRes != null) {
+                        property.put("cq", objRes);
+                    }
                     propertyArray.put(property);
                 }
             }
@@ -1131,6 +1144,67 @@ public class CategoryDAO {
             }
         }
         return propertyArray;
+    }
+
+    public JSONObject addCounterQ(Connection objConn, String id) throws SQLException, JSONException {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        JSONObject cq = null;
+        JSONObject property = null;
+        String selectcat1 = ConfigUtil.getProperty("select.cat.query2", "SELECT * FROM faq");
+        selectcat1 = selectcat1 + " where counter_q_id='" + id + "'";
+        pstmt = objConn.prepareStatement(selectcat1);
+        rs = pstmt.executeQuery();
+        if (rs.next()) {
+            property = new JSONObject();
+            cq = new JSONObject();
+            String q_id = Utilities.nullToEmpty(rs.getString(Constants.id));
+            
+            property.put(Constants.id, q_id);
+            property.put("question", Utilities.nullToEmpty(rs.getString("question")));
+            property.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
+            property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+            // cq.put("cq", property);
+            JSONObject objRes = addCounterQ(objConn, q_id);
+            if (objRes != null) {
+                property.put("cq", objRes);
+            }
+        }
+        return property;
+    }
+    
+       public int deletefaq(String id) throws SQLException, Exception {
+        String delete_sub_category = ConfigUtil.getProperty("delete_sub_faq", "DELETE FROM `faq` WHERE id=?");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+
+        Connection objConn = null;
+        int status = 0;
+        try {
+            objConn = dbconnection.getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(delete_sub_category);
+                pstmt.setString(1, id);
+                status = pstmt.executeUpdate();
+
+                logger.debug("no of res deletetd is :" + status);
+
+            } else {
+                logger.error("delete_sub_category(): connection object is null");
+            }
+        } catch (SQLException sqle) {
+            logger.error("delete_sub_category() : Got SQLException " + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle.getMessage());
+        } catch (Exception e) {
+            logger.error("delete_sub_category() Got Exception : " + Utilities.getStackTrace(e));
+            throw new Exception(e.getMessage());
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return status;
     }
 
 }

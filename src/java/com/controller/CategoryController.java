@@ -571,17 +571,17 @@ public class CategoryController {
         String transId = UUID.randomUUID().toString();
         try {
             user = Utilities.fromJson(strJSON, User.class);
-            if (StringUtils.isBlank(user.getName())) {
-                return Utilities.prepareReponse(INVALID_USERID.getCode(), INVALID_USERID.DESC(), transId);
-            }
+//            if (StringUtils.isBlank(user.getName())) {
+//                return Utilities.prepareReponse(INVALID_USERID.getCode(), INVALID_USERID.DESC(), transId);
+//            }
 
             // LoginType=1 is direct signup, so password is mandatory
             if (StringUtils.isBlank(user.getEmail())) {
                 return Utilities.prepareReponse(INVALID_EMAILID.getCode(), INVALID_EMAILID.DESC(), transId);
             }
-            if (StringUtils.isBlank(user.getMobile()) || !StringUtils.isNumeric(user.getMobile())) {
-                return Utilities.prepareReponse(INVALID_MOBILE_NUMBER.getCode(), INVALID_MOBILE_NUMBER.DESC(), transId);
-            }
+//            if (StringUtils.isBlank(user.getMobile()) || !StringUtils.isNumeric(user.getMobile())) {
+//                return Utilities.prepareReponse(INVALID_MOBILE_NUMBER.getCode(), INVALID_MOBILE_NUMBER.DESC(), transId);
+//            }
             if (StringUtils.isBlank(user.getQuestion())) {
                 return Utilities.prepareReponse(INVALID_Q.getCode(), INVALID_Q.DESC(), transId);
             }
@@ -596,9 +596,9 @@ public class CategoryController {
         return strResponse;
     }
 
-    @RequestMapping(value = "/api/getfaq1", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/getfaqlist", method = RequestMethod.GET)
     public @ResponseBody
-    byte[] getfaq1(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "mobile", required = false) String mobile, @RequestParam(value = "email", required = false) String email, HttpSession httpSession) throws UnsupportedEncodingException {
+    byte[] getfaqlist(@RequestParam(value = "email", required = false) String email, HttpSession httpSession) throws UnsupportedEncodingException {
         JSONArray strResult = null;
         String transId = UUID.randomUUID().toString();
 
@@ -607,8 +607,6 @@ public class CategoryController {
 //            objRequest.put("code", "0");
 //            objRequest.put("description", "success");
             User user = new User();
-            user.setName(name);
-            user.setMobile(mobile);
             user.setEmail(email);
             strResult = objUserService.getFAQ(user);
 
@@ -681,5 +679,11 @@ public class CategoryController {
         }
     }
 
+    @RequestMapping(value = "/api/deletefaq", method = RequestMethod.GET, consumes = {"application/xml", "application/json"}, produces = {"application/json"})
+    public String deletefaq(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) {
+        String transId = UUID.randomUUID().toString();
+        String strResponse = objUserService.deletefaq(id, transId);
 
+        return strResponse;
+    }
 }
