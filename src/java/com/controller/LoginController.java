@@ -897,5 +897,63 @@ public class LoginController {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
+    
+    @RequestMapping(value = "/ask_list", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
+    public byte[] ask_list(@RequestParam("page") int page, @RequestParam("rows") int endIndex) throws UnsupportedEncodingException {
+        String strTid = UUID.randomUUID().toString();
+        String strResult = null;
+        try {
+            int fromIndex = 0;
+            if (page > 0) {
+                fromIndex = (page - 1) * endIndex;
+            }
+            JSONObject json = new JSONObject();
+            JSONArray obj = objUserService.ask_list(strTid, fromIndex, endIndex);
+            json.put("total", objUserService.ask_listCount(strTid));
+            json.put("page", page);
+            json.put("records", obj.length());
+            json.put("rows", obj);
+            return json.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), strTid).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid).getBytes("UTF-8");
+        }
+    }
+    
+    @RequestMapping(value = "/list_ask", method = RequestMethod.GET)
+    public Object list_ask(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("list_ask");
+        return model;
+    }
+    
+    @RequestMapping(value = "/view_ask", method = RequestMethod.GET)
+    public Object view_ask(HttpServletRequest request) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("view_ask");
+        return model;
+    }
+    
+    @RequestMapping(value = "getasklist", method = {RequestMethod.GET, RequestMethod.POST}, produces = {"application/json"})
+    public byte[] getasklist(@RequestParam(value = "id", required = false) String id, HttpSession httpSession) throws UnsupportedEncodingException {
+        JSONObject json = new JSONObject();
+        JSONArray strResult = null;
+        String transId = UUID.randomUUID().toString();
+        try {
+            strResult = objUserService.getasklist(id);
+            json.put("rows", strResult);
+            //System.out.println("svn test");
+            return json.toString().getBytes("UTF-8");
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            return Utilities.prepareReponse(INVALID_JSON.getCode(), INVALID_JSON.DESC(), transId).getBytes("UTF-8");
+        } catch (Exception e) {
+            logger.error(e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
+        }
+    }
 
 }

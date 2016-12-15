@@ -84,6 +84,7 @@
             <li><a href="list_audio">Audio</a></li>
             <li><a href="list_video">Video</a></li>
             <li><a href="list_ferozan">Sham-E-Ferozan</a></li>
+            <li><a href="list_ask">Ask Question</a></li>
         </ul>
     </div>
   <script type="text/javascript">

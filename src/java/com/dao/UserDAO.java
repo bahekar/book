@@ -38,6 +38,7 @@ import com.common.RestBean;
 import com.common.RestImages;
 
 import com.common.Utilities;
+import static com.dao.CategoryDAO.logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -55,6 +56,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -1760,6 +1762,146 @@ public class UserDAO {
         }
 
         return -1;
+    }
+    
+    public JSONArray ask_list(String strTid, int fromIndex, int endIndex) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("query", "SELECT * from faq LIMIT " + fromIndex + "," + endIndex + "");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(query);
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, rs.getString(Constants.id));
+                    property.put("email", Utilities.nullToEmpty(rs.getString("email")));
+                    property.put("question", Utilities.nullToEmpty(rs.getString("question")));
+                    property.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while ask_list" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while ask_list" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+    
+    public int ask_listCount(String strTid) throws SQLException, Exception {
+        String query = ConfigUtil.getProperty("count.query", "SELECT count(*) as count FROM faq");
+
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        int count = 0;
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(query);
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    count = rs.getInt("count");
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(" Got SQLException while ask_listCount" + Utilities.getStackTrace(sqle));
+            throw new SQLException(sqle);
+        } catch (Exception e) {
+            logger.error(" Got Exception while ask_listCount" + Utilities.getStackTrace(e));
+            throw new Exception(e);
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return count;
+    }
+    
+    public JSONArray getasklist(String id) {
+        String selectcat = ConfigUtil.getProperty("select.query1", "SELECT * FROM faq");
+        selectcat = selectcat + " where id='" + id + "' and counter_q_id IS null";
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        Connection objConn = null;
+        JSONArray propertyArray = new JSONArray();
+        StringBuffer ob = new StringBuffer();
+        //lockphots1.lock();
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(selectcat);
+                rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    String q_id = Utilities.nullToEmpty(rs.getString(Constants.id));
+                    JSONObject property = new JSONObject();
+                    property.put(Constants.id, q_id);
+                    property.put("question", Utilities.nullToEmpty(rs.getString("question")));
+                    property.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
+                    property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+                    JSONObject objRes = addCounterQuestion(objConn, q_id);
+                    if (objRes != null) {
+                        property.put("cq", objRes);
+                    }
+                    propertyArray.put(property);
+                }
+            }
+        } catch (SQLException sqle) {
+
+            logger.error(" Got SQLException while sub_category_list" + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+
+            logger.error(" Got Exception while sub_category_list" + Utilities.getStackTrace(e));
+
+        } finally {
+            //lockphots1.unlock();
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return propertyArray;
+    }
+
+    public JSONObject addCounterQuestion(Connection objConn, String id) throws SQLException, JSONException {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        JSONObject cq = null;
+        JSONObject property = null;
+        String selectcat1 = ConfigUtil.getProperty("select.query2", "SELECT * FROM faq");
+        selectcat1 = selectcat1 + " where counter_q_id='" + id + "'";
+        pstmt = objConn.prepareStatement(selectcat1);
+        rs = pstmt.executeQuery();
+        if (rs.next()) {
+            property = new JSONObject();
+            cq = new JSONObject();
+            String q_id = Utilities.nullToEmpty(rs.getString(Constants.id));
+            
+            property.put(Constants.id, q_id);
+            property.put("question", Utilities.nullToEmpty(rs.getString("question")));
+            property.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
+            property.put("created_datetime", Utilities.nullToEmpty(rs.getString("created_datetime")));
+            // cq.put("cq", property);
+            JSONObject objRes = addCounterQuestion(objConn, q_id);
+            if (objRes != null) {
+                property.put("cq", objRes);
+            }
+        }
+        return property;
     }
 
 }

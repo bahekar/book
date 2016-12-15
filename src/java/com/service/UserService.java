@@ -482,7 +482,7 @@ public class UserService {
         return objUserDAO.getUserID(userId, transId);
     }
     
-      public String signIn(LoginRequestBean reqBean, String strTid) {
+    public String signIn(LoginRequestBean reqBean, String strTid) {
         int isUpdated = 0;
         try {
             return objUserDAO.loginDetails(reqBean, strTid);
@@ -493,8 +493,20 @@ public class UserService {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
         }
     }
-   public String passwordService(UserPasswordBean userPasswordBean, String transId) throws SQLException, Exception {
+    public String passwordService(UserPasswordBean userPasswordBean, String transId) throws SQLException, Exception {
         return objUserDAO.passwordService(userPasswordBean, transId);
     }
+    
+    public JSONArray ask_list(String transId, int fromIndex, int endIndex) throws SQLException, Exception {
+        return objUserDAO.ask_list(transId, fromIndex, endIndex);
+    }
+    
+    public int ask_listCount(String transId) throws SQLException, Exception {
+        return objUserDAO.ask_listCount(transId);
+    }
 
+    public JSONArray getasklist(String id) {
+        return objUserDAO.getasklist(id);
+    }
+    
 }
