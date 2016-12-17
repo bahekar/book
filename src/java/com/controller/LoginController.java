@@ -876,8 +876,8 @@ public class LoginController {
         try {
             userPasswordBean = Utilities.fromJson(strJSON, UserPasswordBean.class);
 
-            if (StringUtils.isBlank(userPasswordBean.getEmail())) {
-                return Utilities.prepareReponse(INVALID_EMAILID.getCode(), INVALID_EMAILID.DESC(), strTid);
+            if (StringUtils.isBlank(userPasswordBean.getMobile())) {
+                return Utilities.prepareReponse(INVALID_MOBILE_NUMBER.getCode(), INVALID_MOBILE_NUMBER.DESC(), strTid);
             }
             if (StringUtils.isBlank(userPasswordBean.getOldpwd())) {
                 return Utilities.prepareReponse(INVALID_PASSWORD.getCode(), INVALID_PASSWORD.DESC(), strTid);

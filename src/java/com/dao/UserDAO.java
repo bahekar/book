@@ -1608,7 +1608,7 @@ public class UserDAO {
     }
 
     public String passwordService(UserPasswordBean userPasswordBean, String transId) throws SQLException, Exception {
-        String tokenQuery = ConfigUtil.getProperty("user.password.token", "select * from users where user_id=?");
+        String tokenQuery = ConfigUtil.getProperty("user.password.token", "select * from users where mobile=?");
         String forgotQuery = ConfigUtil.getProperty("user.password.forgot.query", "select * from users where forgot_password_token=?");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -1625,14 +1625,14 @@ public class UserDAO {
 //                    pstmt.setString(1, userPasswordBean.getUserId().trim());
 //
 //                }
-                if (StringUtils.isNotBlank(userPasswordBean.getEmail())) {
+                if (StringUtils.isNotBlank(userPasswordBean.getMobile())) {
                     pstmt = objConn.prepareStatement(tokenQuery);
-                    pstmt.setString(1, userPasswordBean.getEmail().trim());
+                    pstmt.setString(1, userPasswordBean.getMobile().trim());
                 } else {
                     tokenQuery = ConfigUtil.getProperty("user.password.token", "select * from users where mobile=?");
 
                     pstmt = objConn.prepareStatement(tokenQuery);
-                    pstmt.setString(1, userPasswordBean.getEmail().trim());
+                    pstmt.setString(1, userPasswordBean.getMobile().trim());
                 }
                 rs = pstmt.executeQuery();
                 if (rs.next()) {
@@ -1781,7 +1781,7 @@ public class UserDAO {
                 while (rs.next()) {
                     JSONObject property = new JSONObject();
                     property.put(Constants.id, rs.getString(Constants.id));
-                    property.put("email", Utilities.nullToEmpty(rs.getString("email")));
+                    property.put("mobile", Utilities.nullToEmpty(rs.getString("mobile")));
                     property.put("question", Utilities.nullToEmpty(rs.getString("question")));
                     property.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
                     propertyArray.put(property);

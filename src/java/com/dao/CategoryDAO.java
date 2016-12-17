@@ -1062,7 +1062,7 @@ public class CategoryDAO {
     }
 
     public int addfaq(User user) throws SQLException, Exception {
-        String insertQuery = ConfigUtil.getProperty("store.faq.data.query", "INSERT INTO `adminbook`.`faq`(`email`,`question`) VALUES (?,?)");
+        String insertQuery = ConfigUtil.getProperty("store.faq.data.query", "INSERT INTO `adminbook`.`faq`(`mobile`,`question`) VALUES (?,?)");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
 
@@ -1074,12 +1074,12 @@ public class CategoryDAO {
 
                 if (StringUtils.isBlank(user.getPreviousquestionid())) {
                     pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
-                    pstmt.setString(1, user.getEmail());
+                    pstmt.setString(1, user.getMobile());
                     pstmt.setString(2, user.getQuestion());
                 } else {
-                    insertQuery = ConfigUtil.getProperty("store.faq.data.query", "INSERT INTO `adminbook`.`faq`(`email`,`question`,`counter_q_id`) VALUES (?,?,?)");
+                    insertQuery = ConfigUtil.getProperty("store.faq.data.query", "INSERT INTO `adminbook`.`faq`(`mobile`,`question`,`counter_q_id`) VALUES (?,?,?)");
                     pstmt = objConn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
-                    pstmt.setString(1, user.getEmail());
+                    pstmt.setString(1, user.getMobile());
                     pstmt.setString(2, user.getQuestion());
                     pstmt.setString(3, user.getPreviousquestionid());
                 }
@@ -1103,7 +1103,7 @@ public class CategoryDAO {
 
     public JSONArray getFAQ(User user) {
         String selectcat = ConfigUtil.getProperty("select.cat.query1", "SELECT * FROM faq");
-        selectcat = selectcat + " where email='" + user.getEmail() + "' and counter_q_id IS null";
+        selectcat = selectcat + " where mobile='" + user.getMobile() + "' and counter_q_id IS null";
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;

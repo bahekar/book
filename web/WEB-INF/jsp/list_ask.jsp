@@ -33,7 +33,7 @@
         length = $('#tt').datagrid('getRows').length;
         htmocontent = '<div class="well"><table class="table"><thead><tr>';
         htmocontent = htmocontent + '<th>#</th>';
-        htmocontent = htmocontent + '<th>Email</th>';
+        htmocontent = htmocontent + '<th>Mobile</th>';
         htmocontent = htmocontent + '<th>Question</th>';
         htmocontent = htmocontent + '<th>Answer</th>';
         htmocontent = htmocontent + '<th>Edit</th>';
@@ -43,7 +43,7 @@
             var selectedRow = $('#tt').datagrid('getRows')[i];
             htmocontent = htmocontent + '<tr>';
             htmocontent = htmocontent + '<td>' + selectedRow.id + '</td>';
-            htmocontent = htmocontent + '<td>' + selectedRow.email + '</td>';
+            htmocontent = htmocontent + '<td>' + selectedRow.mobile + '</td>';
             htmocontent = htmocontent + '<td>' + selectedRow.question + '</td>';
             htmocontent = htmocontent + '<td>' + selectedRow.answer + '</td>';
             htmocontent = htmocontent + '<td><a href="#" onclick="editcontent(' + selectedRow.id + ')" >Edit</a></td>';

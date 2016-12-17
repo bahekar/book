@@ -576,8 +576,8 @@ public class CategoryController {
 //            }
 
             // LoginType=1 is direct signup, so password is mandatory
-            if (StringUtils.isBlank(user.getEmail())) {
-                return Utilities.prepareReponse(INVALID_EMAILID.getCode(), INVALID_EMAILID.DESC(), transId);
+            if (StringUtils.isBlank(user.getMobile())) {
+                return Utilities.prepareReponse(INVALID_MOBILE_NUMBER.getCode(), INVALID_MOBILE_NUMBER.DESC(), transId);
             }
 //            if (StringUtils.isBlank(user.getMobile()) || !StringUtils.isNumeric(user.getMobile())) {
 //                return Utilities.prepareReponse(INVALID_MOBILE_NUMBER.getCode(), INVALID_MOBILE_NUMBER.DESC(), transId);
@@ -598,7 +598,7 @@ public class CategoryController {
 
     @RequestMapping(value = "/api/getfaqlist", method = RequestMethod.GET)
     public @ResponseBody
-    byte[] getfaqlist(@RequestParam(value = "email", required = false) String email, HttpSession httpSession) throws UnsupportedEncodingException {
+    byte[] getfaqlist(@RequestParam(value = "mobile", required = false) String mobile, HttpSession httpSession) throws UnsupportedEncodingException {
         JSONArray strResult = null;
         String transId = UUID.randomUUID().toString();
 
@@ -607,7 +607,7 @@ public class CategoryController {
 //            objRequest.put("code", "0");
 //            objRequest.put("description", "success");
             User user = new User();
-            user.setEmail(email);
+            user.setMobile(mobile);
             strResult = objUserService.getFAQ(user);
 
 //            objRequest.put("contentlist", strResult);
