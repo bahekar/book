@@ -1681,7 +1681,7 @@ public class UserDAO {
                         }
 
                         String newPassword = AESAlgo.encrypt(userPasswordBean.getNewpwd());
-                        int nRes = updatePassword(newPassword, userPasswordBean.getEmail());
+                        int nRes = updatePassword(newPassword, userPasswordBean.getMobile());
                         if (nRes == Constants.UPDATED_RECORD_SUCCESSFULLY) {
                             return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), transId);
                         } else {
@@ -1738,8 +1738,8 @@ public class UserDAO {
         return -1;
     }
 
-    public int updatePassword(String password, String userId) {
-        String tokenQuery = ConfigUtil.getProperty("user.password.update.query", "update users set password=? where user_id=?");
+    public int updatePassword(String password, String mobile) {
+        String tokenQuery = ConfigUtil.getProperty("user.password.update.query", "update users set password=? where mobile=?");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         Connection objConn = null;
@@ -1748,7 +1748,7 @@ public class UserDAO {
             if (objConn != null) {
                 pstmt = objConn.prepareStatement(tokenQuery);
                 pstmt.setString(1, password);
-                pstmt.setString(2, userId);
+                pstmt.setString(2, mobile);
                 return pstmt.executeUpdate();
             }
         } catch (SQLException sqle) {
