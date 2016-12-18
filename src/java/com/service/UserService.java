@@ -509,4 +509,27 @@ public class UserService {
         return objUserDAO.getasklist(id);
     }
     
+    public JSONObject edit_ask(String id) {
+        return objUserDAO.edit_ask(id);
+    }
+    
+    public String editask(Content objContent) {
+        int isUpdated = 0;
+        int nUserID = -1;
+        ResponseCodes.ServiceErrorCodes errorCode = null;
+        String strTid = UUID.randomUUID().toString();
+        try {
+
+            isUpdated = objUserDAO.editask(objContent);
+            if (isUpdated > 0) {
+                return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), strTid);
+            } else {
+                return Utilities.prepareReponse(INVALID_DATA.getCode(), INVALID_DATA.DESC(), strTid);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception in editask(),ex:" + e.getMessage(), e);
+            return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), strTid);
+        }
+    }
 }

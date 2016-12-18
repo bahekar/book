@@ -1904,4 +1904,71 @@ public class UserDAO {
         return property;
     }
 
+    public JSONObject edit_ask(String id) {
+        JSONObject neighborhoodObj = new JSONObject();
+        String single_details = ConfigUtil.getProperty("details", "SELECT * from faq where id = " + id);
+        ResultSet rs = null;
+        ResultSet rs1 = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement pstmt1 = null;
+        Connection objConn = null;
+        try {
+
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(single_details);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    neighborhoodObj.put("id", Utilities.nullToEmpty(rs.getString("id")));
+                    neighborhoodObj.put("question", Utilities.nullToEmpty(rs.getString("question")));
+                    neighborhoodObj.put("answer", Utilities.nullToEmpty(rs.getString("answer")));
+                }
+            }
+        } catch (Exception e) {
+            logger.error(" Got edit_ask" + Utilities.getStackTrace(e));
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+                dbconnection.closeConnection(rs1, pstmt1, objConn);
+            }
+        }
+        return neighborhoodObj;
+    }
+    
+    public int editask(Content objContent) {
+        String updateQuery = ConfigUtil.getProperty("query", "UPDATE `adminbook`.`faq` SET `question`=?, answer=? where id=? ");
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        PreparedStatement pstmt1 = null;
+        Connection objConn = null;
+        try {
+            objConn = DBConnection.getInstance().getConnection();
+            if (objConn != null) {
+                pstmt = objConn.prepareStatement(updateQuery, Statement.RETURN_GENERATED_KEYS);
+
+                pstmt.setString(1, objContent.getTitle());
+                pstmt.setString(2, objContent.getLink());
+                pstmt.setString(3, objContent.getCid());
+
+                int nRes = pstmt.executeUpdate();
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    nRes = rs.getInt(1);
+                }
+                return nRes;
+            }
+        } catch (SQLException sqle) {
+            logger.error("edit editask() : Got SQLException " + Utilities.getStackTrace(sqle));
+
+        } catch (Exception e) {
+            logger.error("edit editask() : Got SQLException " + Utilities.getStackTrace(e));
+
+        } finally {
+            if (objConn != null) {
+                dbconnection.closeConnection(rs, pstmt, objConn);
+            }
+        }
+        return -1;
+    }
 }

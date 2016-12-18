@@ -955,5 +955,33 @@ public class LoginController {
             return Utilities.prepareReponse(GENERIC_ERROR.getCode(), GENERIC_ERROR.DESC(), transId).getBytes("UTF-8");
         }
     }
+    
+    @RequestMapping(value = "/edit_ask", method = RequestMethod.GET)
+    public Object edit_ask(HttpServletRequest request, @RequestParam("id") String id) {
 
+        ModelAndView model = new ModelAndView();
+        JSONObject strResponse = objUserService.edit_ask(id);
+        HttpSession session = request.getSession();
+        session.setAttribute("restdet", strResponse.toString());
+        model.setViewName("edit_ask");
+        return model;
+    }
+    
+    @RequestMapping(value = "/editask", method = RequestMethod.POST, produces = {"application/json"})
+    public ModelAndView editask(@RequestParam(value = "title", required = false) String title, @RequestParam(value = "cid", required = false) String cid, @RequestParam(value = "link", required = false) String link, HttpSession httpSession) {
+        String response = "";
+        String mainfilename = "";
+        Content objContent = new Content();
+        try {
+            objContent.setTitle(title);
+            objContent.setCid(cid);
+            objContent.setLink(link);
+
+            response = objUserService.editask(objContent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("redirect:/list_ask");
+    }
 }
