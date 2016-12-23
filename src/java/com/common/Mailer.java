@@ -55,10 +55,10 @@ public class Mailer {
      */
     public Mailer(Properties prop) {
         m_prop = prop;
-        m_smtp_host = m_prop.getProperty("smtp.host", "smtp.mandrillapp.com");
-        m_default_from = m_prop.getProperty("smtp.default.from", "info@aqarabia.net");
-        m_strUserName = m_prop.getProperty("smtp.username", "info@aqarabia.net");
-        m_strPassword = m_prop.getProperty("smtp.password", "Pl0iuN1kFNJIwvUIItOJLA");
+        m_smtp_host = m_prop.getProperty("smtp.host", "smtp.gmail.com");
+        m_default_from = m_prop.getProperty("smtp.default.from", "askafatwa@gmail.com");
+        m_strUserName = m_prop.getProperty("smtp.username", "askafatwa@gmail.com");
+        m_strPassword = m_prop.getProperty("smtp.password", "khalid@rahmani");
         m_SmtpTimeout = m_prop.getProperty("smtp.timeout", "20000");
         m_SmtpConTimeout = m_prop.getProperty("smtp.connection.timeout", "30000");
         m_bDebgMail = Boolean.parseBoolean(m_prop.getProperty("mail.debug", "false"));
@@ -171,7 +171,7 @@ public class Mailer {
 		//props.put("mail.smtp.socketFactory.port", "465");
 		//props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
 		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.port", "587");
+		props.put("mail.smtp.port", "465");
 //        Session session = null;
 //        if (m_strUserName.trim().equals("") || m_strPassword.trim().equals("")) {
 //            session = Session.getInstance(props);

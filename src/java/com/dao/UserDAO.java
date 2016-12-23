@@ -36,6 +36,7 @@ import static com.common.ResponseCodes.ServiceErrorCodes.USER_INACTIVE;
 import static com.common.ResponseCodes.ServiceErrorCodes.WRONG_PASSWORD;
 import com.common.RestBean;
 import com.common.RestImages;
+import com.common.SendMailSSL;
 
 import com.common.Utilities;
 import static com.dao.CategoryDAO.logger;
@@ -82,10 +83,10 @@ public class UserDAO {
 //        url = "http://localhost:8080/menubook";
         HttpDispatchClient.getInstance();
         objMail = new Mailer(ConfigUtil.getProperties());
-        mailFrom = ConfigUtil.getProperty("smtp.mail.from", "info@bookmanagement.net");
-        mailCC = ConfigUtil.getProperty("smtp.mail.cc", "chhavibahekar@gmail.com");
-        mailBCC = ConfigUtil.getProperty("smtp.mail.bcc", "chhavibahekar@gmail.com");
-        mailSubjectForForgotPwd = ConfigUtil.getProperty("smtp.mail.subject", "Your new bookmanagement password");
+        mailFrom = ConfigUtil.getProperty("smtp.mail.from", "askafatwa@gmail.com");
+       // mailCC = ConfigUtil.getProperty("smtp.mail.cc", "chhavibahekar@gmail.com");
+       // mailBCC = ConfigUtil.getProperty("smtp.mail.bcc", "chhavibahekar@gmail.com");
+        mailSubjectForForgotPwd = ConfigUtil.getProperty("smtp.mail.subject", "Your bookmanagement password");
         mailSubjectRequestInfo = ConfigUtil.getProperty("smtp.mail.subject.requestinfo", "Request Info For a Property");
 
         forgotPWDMailContent = ConfigUtil.getProperty("mail.forgotpwd.content", "forgot password content");
@@ -1647,7 +1648,7 @@ public class UserDAO {
                         String tempPwd = Utilities.generateRandomString();
                        // int nRes = updateToken(tempPwd, userPasswordBean.getUserId());
                         String pwdMailContent = forgotPWDMailContent;
-                         String newPassword = AESAlgo.encrypt(rs.getString("password"));
+                         String newPassword = AESAlgo.decrypt(rs.getString("password"));
                       //  if (nRes == Constants.INSERT_RECORD_SUCCESSFULLY) {
                             pwdMailContent = pwdMailContent.replaceAll("\\$\\(newPassword\\)", newPassword);
                             pwdMailContent = pwdMailContent.replaceAll("\\$\\(userId\\)", email);
@@ -1655,9 +1656,11 @@ public class UserDAO {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Mail sending to user => " + email);
                             }
-                       //  int   nRes = objMail.sendHtmlMail(mailFrom, email, mailCC, mailBCC, mailSubjectForForgotPwd, pwdMailContent, new ArrayList());
-                       // }
-                          int   nRes =1;
+                      //   int   nRes = objMail.sendHtmlMail(mailFrom, email, mailCC, mailBCC, mailSubjectForForgotPwd, pwdMailContent, new ArrayList());
+                   //   pwdMailContent=""
+SendMailSSL.mailsend(email, mailSubjectForForgotPwd, pwdMailContent);
+// }
+                          //int   nRes =1;
                             return Utilities.prepareReponse(SUCCESS.getCode(), SUCCESS.DESC(), transId);
                     }
 //                    

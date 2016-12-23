@@ -23,7 +23,7 @@ public class AESAlgo {
 
     public static void main(String[] args) {
         try {
-            System.out.println("args = " + encrypt("book@1616"));
+            System.out.println("args = " + decrypt("chhrQ136dn3pGs03sC/LPA=="));
         } catch (Exception ex) {
             Logger.getLogger(AESAlgo.class.getName()).log(Level.SEVERE, null, ex);
         }
